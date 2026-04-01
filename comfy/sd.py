@@ -440,7 +440,7 @@ class VAE:
             sd = diffusers_convert.convert_vae_state_dict(sd)
 
         if model_management.is_amd():
-            VAE_KL_MEM_RATIO = 2.73
+            VAE_KL_MEM_RATIO = 1.3
         else:
             VAE_KL_MEM_RATIO = 1.0
 
