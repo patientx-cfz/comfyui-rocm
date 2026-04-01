@@ -31,5 +31,4 @@ install.bat
 ## Credits
 
 - [ComfyUI](https://github.com/comfyanonymous/ComfyUI)
-- [Sfinktah](https://github.com/sfinktah)
-- [jeremymeyers](https://github.com/jeremymeyers)
+- [AMD TheRock Team]([https://github.com/ROCm/TheRock) 
