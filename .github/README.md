@@ -20,6 +20,7 @@ Windows-only version of ComfyUI which uses AMD's official ROCM and PyTorch libra
 install.bat
 ```
 
+* This is partly portable doesn't need python installed in the system. You can try it seperately with `Comfyui-Zluda`for example, without interfering with it. It also doesn't need HIP installed , those components are now installed into the venv with the ROCM packages. 
 * You can use `comfyui-rocm.bat` or put a shortcut of it on your desktop, to run the app later. My recommendation is make a copy of `comfyui-rocm.bat` with another name maybe and modify that copy so when updating you won't get into trouble.
 * At the moment , there are some startup options I am using with my rx 6800 in the batch file, you can edit them , I'll try to add more options in there.
 
