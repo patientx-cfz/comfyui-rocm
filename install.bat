@@ -1,11 +1,11 @@
 @echo off
 cls
 setlocal enabledelayedexpansion
-title ComfyUI - AMD ROCM Installer
-echo ===================================================
-echo   ComfyUI - AMD ROCM - Automatic Installer
-echo   (AMD RDNA2-RDNA3-RDNA4)
-echo ===================================================
+title comfyui-rocm Installer
+echo ====================================================
+echo        comfyui-rocm - Automatic Installer
+echo  (AMD RDNA1 * RDNA2 * RDNA3 * RDNA4 6000s to 9000s)
+echo ====================================================
 echo.
 
 :: 1. Check if Python exists
@@ -98,6 +98,20 @@ if "!arch!"=="" (
 echo [*] Detected GPU architecture: !arch!
 
 :: Install PyTorch based on detected GPU
+if "!arch!"=="gfx101X" (
+    echo [*] Installing ROCm for RDNA1 ^(gfx101X^)...
+    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2-staging/gfx101X-dgpu/ --no-warn-script-location >nul 2>&1
+    if errorlevel 1 goto :install_failed
+    .\python_env\scripts\rocm-sdk init >nul 2>&1 
+    if errorlevel 1 (
+        echo [!] Warning: rocm-sdk init failed, continuing anyway...
+    )
+	echo [*] Installing PyTorch for RDNA1 ^(gfx101X^)...
+    .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2-staging/gfx101X-dgpu/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1
+    if errorlevel 1 goto :install_failed
+    goto :install_requirements
+)
+
 if "!arch!"=="gfx103X" (
     echo [*] Installing ROCm for RDNA2 ^(gfx103X^)...
     .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2-staging/gfx103X-dgpu/ --no-warn-script-location >nul 2>&1
@@ -244,7 +258,7 @@ exit /b 1
 
 :install_requirements
 echo.
-echo [*] Installing ComfyUI - AMD ROCM...
+echo [*] Installing comfyui-rocm...
 
 :: Check if requirements.txt exists
 if not exist "requirements.txt" (
@@ -291,18 +305,18 @@ goto :install_complete
 
 :install_complete
 echo.
-echo ===================================================
+echo ====================================================
 echo   Installation Complete!
-echo   Run "comfyui-rocm.bat" to start ComfyUI - AMD ROCM
-echo ===================================================
+echo   Run "comfyui-rocm.bat" to start comfyui-rocm
+echo ====================================================
 goto :end
 
 :install_failed
 echo.
-echo ===================================================
+echo ====================================================
 echo   Installation Failed!
 echo   Check the error messages above for details.
-echo ===================================================
+echo ====================================================
 goto :end
 
 :end
