@@ -334,7 +334,7 @@ if errorlevel 1 goto :install_failed
 echo [*] Installing flash-attention if available...
 
 set "install_fa=0"
-for %%G in (gfx90X gfx94X gfx950 gfx110X gfx1150 gfx1151 gfx1152 gfx1153 gfx120X) do (
+for %%G in (gfx90a gfx942 gfx950 gfx1100 gfx1101 gfx1102 gfx1150 gfx1151 gfx1152 gfx1153 gfx1200 gfx1201) do (
     if /I "!arch!"=="%%G" set "install_fa=1"
 )
 if /I "!install_fa!"=="1" goto :install_fa
@@ -343,8 +343,13 @@ goto :fa_done
 
 :install_fa
 echo [*] Installing flash-attention for !arch!...
-.\python_env\python.exe -m pip install https://github.com/0xDELUXA/flash-attention/releases/download/v2.8.4_win-rocm/flash_attn-2.8.4-py3-none-any.whl --no-deps --quiet
-if errorlevel 1 echo [!] Warning: flash-attention install failed, skipping...
+.\python_env\python.exe -m pip install https://github.com/0xDELUXA/flash-attention/releases/download/v2.8.4_win-rocm/flash_attn-2.8.4-py3-none-win_amd64.whl --quiet
+if errorlevel 1 (
+    echo [!] Warning: flash-attention install failed, skipping...
+    goto :fa_done
+)
+.\python_env\python.exe -m pip install https://github.com/0xDELUXA/flash-attention/releases/download/v2.8.4_win-rocm/amd_aiter-0.0.0-py3-none-win_amd64.whl --quiet
+if errorlevel 1 echo [!] Warning: aiter install failed, flash-attention may not work...
 
 :fa_done
 
