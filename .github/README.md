@@ -18,6 +18,7 @@ install.bat
 ```
 
 * You can use `comfyui-rocm.bat` or put a shortcut of it on your desktop, to run the app later. My recommendation is make a copy of `comfyui-rocm.bat` with another name maybe and modify that copy so when updating you won't get into trouble.
+* At the moment , there are some startup options I am using with my rx 6800 in the batch file, you can edit them , I'll try to add more options in there.
 
 ## First-Time Launch
 * If you have done every previous step correctly, it will install without errors. You can start the app with `comfyui-rocm.bat`. If you already have checkpoints copy them into your `models/checkpoints` folder so you can use them with ComfyUI's default workflows. You can use [ComfyUI's Extra Model Paths YAML file](https://docs.comfy.org/development/core-concepts/models) to specify custom folders.
