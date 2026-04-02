@@ -300,7 +300,7 @@ echo [*] Installing bitsandbytes if available...
 set "install_bnb_new=0"
 
 REM ---- check newer supported architectures ----
-for %%G in (gfx90a gfx942 gfx950 gfx1100 gfx1101 gfx1150 gfx1151 gfx1200 gfx1201) do (
+for %%G in (gfx90X gfx94X gfx950 gfx110X gfx1150 gfx1151 gfx1152 gfx1153 gfx120X) do (
     if /I "!arch!"=="%%G" set "install_bnb_new=1"
 )
 
