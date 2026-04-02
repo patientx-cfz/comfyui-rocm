@@ -331,6 +331,23 @@ echo No compatible bitsandbytes build for !arch!
 
 if errorlevel 1 goto :install_failed
 
+echo [*] Installing flash-attention if available...
+
+set "install_fa=0"
+for %%G in (gfx90X gfx94X gfx950 gfx110X gfx1150 gfx1151 gfx1152 gfx1153 gfx120X) do (
+    if /I "!arch!"=="%%G" set "install_fa=1"
+)
+if /I "!install_fa!"=="1" goto :install_fa
+echo [*] Skipping flash-attention on !arch!...
+goto :fa_done
+
+:install_fa
+echo [*] Installing flash-attention for !arch!...
+.\python_env\python.exe -m pip install https://github.com/0xDELUXA/flash-attention/releases/download/v2.8.4_win-rocm/flash_attn-2.8.4-py3-none-any.whl --no-deps --quiet
+if errorlevel 1 echo [!] Warning: flash-attention install failed, skipping...
+
+:fa_done
+
 :verify_installation
 echo.
 echo [*] Verifying installation...
