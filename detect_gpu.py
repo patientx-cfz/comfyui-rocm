@@ -29,6 +29,10 @@ GPU_TO_GFX = [
     (['rx 6550', 'rx 6500', 'w6500', 'rx 6450', 'rx 6400', 'w6400', 'rx 6300', 'w6300'], 'gfx103X', 'RDNA 2', False),
     (['680m', '660m'], 'gfx103X', 'RDNA 2', False),
     (['610m'], 'gfx103X', 'RDNA 2', False),
+
+    # RDNA1 (gfx101x)
+    (['rx 5700', 'rx 5600'], 'gfx101X', 'RDNA 1', True),
+    (['rx 5500', 'radeon pro v520'], 'gfx101X', 'RDNA 1', True),
     
     # Data Center / Enterprise GPUs
     (['radeon pro vii', 'radeon pro vii'], 'gfx90X', 'Radeon Pro VII', True),
