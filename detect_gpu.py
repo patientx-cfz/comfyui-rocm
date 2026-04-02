@@ -44,7 +44,8 @@ def detect_gpu():
     try:
         # Query AMD GPUs via WMI
         result = subprocess.run(
-            ['wmic', 'path', 'win32_videocontroller', 'get', 'name'],
+            ['powershell', '-NoProfile', '-Command',
+             'Get-CimInstance Win32_VideoController | Select-Object -ExpandProperty Name'],
             capture_output=True,
             text=True,
             check=False
