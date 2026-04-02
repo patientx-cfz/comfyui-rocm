@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 title comfyui-rocm Installer
 echo ====================================================
 echo        comfyui-rocm - Automatic Installer
-echo  (AMD RDNA1 * RDNA2 * RDNA3 * RDNA4 6000s to 9000s)
+echo [AMD RDNA1 * RDNA2 * RDNA3 * RDNA4 (6000s to 9000s)]
 echo ====================================================
 echo.
 
@@ -268,26 +268,66 @@ if not exist "requirements.txt" (
 )
 
 .\python_env\python.exe -m pip install -r requirements.txt --no-warn-script-location >nul 2>&1
+if errorlevel 1 goto :install_failed
 .\python_env\python.exe -m pip install -r manager_requirements.txt --no-warn-script-location >nul 2>&1
+if errorlevel 1 goto :install_failed
 .\python_env\python.exe -m pip install matrix-nio --no-warn-script-location >nul 2>&1
+if errorlevel 1 goto :install_failed
 
 echo [*] Installing extensions...
 
 cd custom_nodes
-git clone https://github.com/patientx/CFZ-SwitchMenu.git --quiet
-git clone https://github.com/patientx/CFZ-Caching --quiet
+if not exist CFZ-SwitchMenu git clone https://github.com/patientx/CFZ-SwitchMenu.git --quiet
+if not exist CFZ-Caching git clone https://github.com/patientx/CFZ-Caching --quiet
 cd ..
 
 echo [*] Installing triton - sageattention(v1)
 .\python_env\python.exe -m pip install triton-windows==3.6.0.post25 --quiet
+if errorlevel 1 goto :install_failed
 .\python_env\python.exe -m pip install sageattention==1.0.6 --quiet
-.\python_env\python.exe -m pip install https://github.com/0xDELUXA/bitsandbytes_win_rocm/releases/download/v0.49.2.dev0-py312-rocm7.12/bitsandbytes-0.49.2.dev0-cp312-cp312-win_amd64.whl --quiet
+if errorlevel 1 goto :install_failed
+
+echo [*] Patching sage-attention...
 del python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block.py >NUL
 curl -sL -o python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block.py https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/refs/heads/master/comfy/customzluda/sa/attn_qk_int8_per_block.py
 del python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block_causal.py >NUL
 curl -sL -o python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block_causal.py https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/refs/heads/master/comfy/customzluda/sa/attn_qk_int8_per_block_causal.py
 del python_env\Lib\site-packages\sageattention\quant_per_block.py >NUL
 curl -sL -o python_env\Lib\site-packages\sageattention\quant_per_block.py https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/refs/heads/master/comfy/customzluda/sa/quant_per_block.py
+
+echo [*] Installing bitsandbytes if available...
+
+set "install_bnb_new=0"
+
+REM ---- check newer supported architectures ----
+for %%G in (gfx90a gfx942 gfx950 gfx1100 gfx1101 gfx1150 gfx1151 gfx1200 gfx1201) do (
+    if /I "!arch!"=="%%G" set "install_bnb_new=1"
+)
+
+REM ---- check gfx103x family safely ----
+if /I "!arch:~0,6!"=="gfx103" (
+    echo [*] Installing bitsandbytes for gfx103x...
+    .\python_env\python.exe -m pip install https://github.com/0xDELUXA/bitsandbytes_win_rocm/releases/download/v0.49.2.dev0-py312-rocm7.12/bitsandbytes-0.49.2.dev0-cp312-cp312-win_amd64.whl --quiet
+    if errorlevel 1 goto :install_failed
+    goto :bnb_done
+)
+
+REM ---- install multi-arch build if matched ----
+if /I "!install_bnb_new!"=="1" goto :install_bnb_new
+
+goto :after_bnb_new
+
+:install_bnb_new
+echo [*] Installing bitsandbytes (multi-arch build)...
+.\python_env\python.exe -m pip install https://github.com/0xDELUXA/bitsandbytes_win_rocm/releases/download/v0.49.2.dev0-py312-rocm7.12-all/bitsandbytes-0.49.2.dev0-cp312-cp312-win_amd64.whl --quiet
+if errorlevel 1 goto :install_failed
+goto :bnb_done
+
+:after_bnb_new
+
+echo No compatible bitsandbytes build for !arch!
+
+:bnb_done
 
 if errorlevel 1 goto :install_failed
 
