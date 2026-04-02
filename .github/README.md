@@ -1,12 +1,15 @@
 # comfyui-rocm
 
-Windows-only version of ComfyUI which uses official ROCM and PyTorch libraries to get better performance with AMD GPUs.
+Windows-only version of ComfyUI which uses AMD's official ROCM and PyTorch libraries to get better performance with AMD GPUs.
 
 (Supported GPU's atm : RDNA2 (everything except mobile gpu's and apu's) , RDNA3 and RDNA4)
 
-## Installation (Windows-Only)
 ### Important Note
 **DON'T INSTALL** into your user directory or inside Windows or Program Files directories. Don't install to a directory with Non-English characters. Best option is to install to the root directory of whichever drive you'd like.
+### Important Note
+
+## Installation (Windows-Only)
+
 1) Download and install GIT. ( available from [https://git-scm.com/download/win](https://git-scm.com/download/win). During installation don't forget to check the box for "Use Git from the Windows Command line and also from 3rd-party-software" to add Git to your system's PATH.)
 2) Download and install Visual C++ Runtime Library, available from [https://aka.ms/vs/17/release/vc_redist.x64.exe](https://aka.ms/vs/17/release/vc_redist.x64.exe)
 3) Download and install Visual Studio Build Tools, available from [https://aka.ms/vs/17/release/vs_BuildTools.exe](https://aka.ms/vs/17/release/vs_BuildTools.exe)
