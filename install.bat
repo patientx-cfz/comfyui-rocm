@@ -14,36 +14,80 @@ if exist "python_env\python.exe" (
     goto :setup_environment
 )
 
-:: 2. Download Python Portable (3.12.9)
-echo [*] [1/5] Downloading Python 3.12 Portable...
+:: 2. Download Python Embeddable (for runtime)
+echo [*] [1/7] Downloading Python 3.12 Embeddable...
 if not exist "python_env" mkdir "python_env"
-curl -L "https://www.python.org/ftp/python/3.12.9/python-3.12.9-embed-amd64.zip" -o "python_env\python.zip" >nul 2>&1
+curl -L "https://www.python.org/ftp/python/3.12.9/python-3.12.9-embed-amd64.zip" -o "python_embed.zip" >nul 2>&1
 if errorlevel 1 (
-    echo [!] Error: Failed to download Python
+    echo [!] Error: Failed to download Python embeddable
     pause
     exit /b 1
 )
 
-:: 3. Unzip
-echo [*] [2/5] Extracting Python...
-tar -xf "python_env\python.zip" -C "python_env" >nul 2>&1
+:: 3. Download Python Full Installer (for dev files)
+echo [*] [2/7] Downloading Python development files...
+curl -L https://www.python.org/ftp/python/3.12.9/python-3.12.9-amd64.zip -o python_full.zip >nul 2>&1
+if errorlevel 1 (
+    echo [!] Error: Failed to download Python installer
+    del "python_embed.zip" >nul 2>&1
+    pause
+    exit /b 1
+)
+
+:: 4. Extract embeddable Python
+echo [*] [3/7] Extracting Python runtime...
+tar -xf "python_embed.zip" -C "python_env" >nul 2>&1
 if errorlevel 1 (
     echo [!] Error: Failed to extract Python
     pause
     exit /b 1
 )
-del "python_env\python.zip"
+del "python_embed.zip"
 
-:: 4. Patch ._pth file (enable import site)
-echo [*] [3/5] Configuring Python...
+:: 5. Install full Python to temp location to extract dev files
+echo [*] [4/7] Installing development components...
+mkdir pythonfull
+tar -xf "python_full.zip" -C "pythonfull" >nul 2>&1
+:: Wait for installation
+timeout /t 3 /nobreak >nul 2>&1
+
+:: 6. Copy development files
+echo [*] [5/7] Copying headers and libraries...
+if exist "pythonfull\include" (
+    xcopy "pythonfull\include" "python_env\include\" /E /I /Q >nul 2>&1
+    echo [*] - Headers copied
+) else (
+    echo [!] Warning: Headers not found
+)
+
+if exist "pythonfull\libs" (
+    xcopy "pythonfull\libs" "python_env\libs\" /E /I /Q >nul 2>&1
+    echo [*] - Libraries copied
+) else (
+    echo [!] Warning: Libs not found
+)
+
+:: Also copy the full Lib folder for completeness
+if exist "\Lib" (
+    xcopy "\Lib" "python_env\Lib\" /E /I /Q >nul 2>&1
+    echo [*]   - Standard library copied
+)
+
+:: Clean up temp installation and installer
+rd /s /q "pythonfull" >nul 2>&1
+del "python_full.zip" >nul 2>&1
+
+:: 7. Configure Python
+echo [*] [6/7] Configuring Python...
 (
 echo python312.zip
+echo .
 echo ..
 echo import site
 ) > "python_env\python312._pth"
 
-:: 5. Install Pip
-echo [*] [4/5] Installing Pip Package Manager...
+:: 8. Install Pip
+echo [*] [7/7] Installing Pip and build tools...
 curl -L "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" >nul 2>&1
 if errorlevel 1 (
     echo [!] Error: Failed to download get-pip.py
@@ -58,8 +102,7 @@ if errorlevel 1 (
 )
 del "get-pip.py"
 
-:: 6. Install build Tools
-echo [*] [5/5] Installing Build Tools...
+:: Install build tools
 .\python_env\python.exe -m pip install --upgrade pip setuptools wheel --no-warn-script-location >nul 2>&1
 if errorlevel 1 (
     echo [!] Error: Failed to install build tools
