@@ -17,6 +17,6 @@ python_env\python.exe main.py ^
 --cache-none ^
 --disable-smart-memory ^
 --disable-pinned-memory ^
---enable-manager
+--enable-manager-legacy-ui
 
 pause
