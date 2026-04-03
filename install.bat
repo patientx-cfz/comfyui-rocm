@@ -269,14 +269,11 @@ if not exist "requirements.txt" (
 
 .\python_env\python.exe -m pip install -r requirements.txt --no-warn-script-location >nul 2>&1
 if errorlevel 1 goto :install_failed
-.\python_env\python.exe -m pip install -r manager_requirements.txt --no-warn-script-location >nul 2>&1
-if errorlevel 1 goto :install_failed
-.\python_env\python.exe -m pip install matrix-nio --no-warn-script-location >nul 2>&1
-if errorlevel 1 goto :install_failed
 
 echo [*] Installing extensions...
 
 cd custom_nodes
+if not exist comfyui-manager git clone https://github.com/Comfy-Org/ComfyUI-Manager --quiet
 if not exist CFZ-SwitchMenu git clone https://github.com/patientx/CFZ-SwitchMenu.git --quiet
 if not exist CFZ-Caching git clone https://github.com/patientx/CFZ-Caching --quiet
 cd ..
