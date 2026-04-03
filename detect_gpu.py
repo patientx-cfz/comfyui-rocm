@@ -1,5 +1,6 @@
 import subprocess
 import sys
+import os
 
 # Comprehensive mapping of GPU model numbers to gfx codes
 # Format: (model_list, gfx_code, architecture_name, supported)
@@ -40,53 +41,117 @@ GPU_TO_GFX = [
     (['mi350x', 'mi355x'], 'gfx950', 'MI350/MI355', True),
 ]
 
-def detect_gpu():
+def detect_gpu_wmic():
     try:
-        # Query AMD GPUs via WMI
         result = subprocess.run(
             ['wmic', 'path', 'win32_videocontroller', 'get', 'name'],
             capture_output=True,
             text=True,
-            check=False
+            check=False,
+            timeout=10
         )
         
-        gpu_list = result.stdout.strip().split('\n')
+        if result.returncode == 0:
+            gpu_list = result.stdout.strip().split('\n')
+            amd_gpus = []
+            for gpu in gpu_list:
+                gpu = gpu.strip()
+                if gpu and gpu != "Name" and "AMD" in gpu and "Radeon" in gpu:
+                    amd_gpus.append(gpu)
+            return amd_gpus
+    except (FileNotFoundError, subprocess.TimeoutExpired, Exception):
+        pass
+    return []
+
+def detect_gpu_powershell():
+    try:
+        ps_command = "Get-WmiObject Win32_VideoController | Select-Object -ExpandProperty Name"
+        result = subprocess.run(
+            ['powershell', '-NoProfile', '-Command', ps_command],
+            capture_output=True,
+            text=True,
+            check=False,
+            timeout=10
+        )
         
-        for gpu in gpu_list:
-            gpu = gpu.strip()
-            if not gpu or gpu == "Name":
-                continue
-            
-            if "AMD" in gpu and "Radeon" in gpu:
-                gpu_lower = gpu.lower()
-                print(f"AMD GPU found: {gpu}")
-                
-                # Check against supported GPU mapping
-                for model_list, gfx, arch_name, supported in GPU_TO_GFX:
-                    for model in model_list:
-                        if model in gpu_lower:
-                            if supported:
-                                print(f"Architecture: {arch_name} ({gfx})")
-                                return gfx
-                            else:
-                                print(f"GPU not supported at the moment, will be coming in the future.")
-                                return None
-                
-                # Anything else is unsupported
-                print("GPU not supported - Only RDNA2 (gfx103X) and newer are fully supported")
-                return None
-        
+        if result.returncode == 0:
+            gpu_list = result.stdout.strip().split('\n')
+            amd_gpus = []
+            for gpu in gpu_list:
+                gpu = gpu.strip()
+                if gpu and "AMD" in gpu and "Radeon" in gpu:
+                    amd_gpus.append(gpu)
+            return amd_gpus
+    except (FileNotFoundError, subprocess.TimeoutExpired, Exception):
+        pass
+    return []
+
+def match_gpu_to_gfx(gpu_name):
+    gpu_lower = gpu_name.lower()
+    
+    for model_list, gfx, arch_name, supported in GPU_TO_GFX:
+        for model in model_list:
+            if model in gpu_lower:
+                return gfx, arch_name, supported
+    
+    return None, None, False
+
+def detect_gpu():
+    print("Attempting to detect AMD GPU...")
+    
+    # Try different detection methods in order of preference
+    amd_gpus = []
+    
+    # Method 1: wmic (fast and works on most systems)
+    print("Trying wmic method...")
+    amd_gpus = detect_gpu_wmic()
+    
+    # Method 2: PowerShell (works on all modern Windows)
+    if not amd_gpus:
+        print("Trying PowerShell method...")
+        amd_gpus = detect_gpu_powershell()
+    
+    if not amd_gpus:
         print("No AMD GPU detected")
+        print("If you have an AMD GPU, please ensure your drivers are installed.")
         return None
     
-    except Exception as e:
-        print(f"Error detecting GPU: {e}")
-        return None
+    # Process detected GPUs
+    print(f"\nFound {len(amd_gpus)} AMD GPU(s):")
+    for gpu in amd_gpus:
+        print(f"  - {gpu}")
+    
+    # Try to match to known architectures
+    for gpu in amd_gpus:
+        gfx, arch_name, supported = match_gpu_to_gfx(gpu)
+        
+        if gfx and supported:
+            print(f"\nMatched GPU: {gpu}")
+            print(f"Architecture: {arch_name} ({gfx})")
+            print("Status: SUPPORTED")
+            return gfx
+        elif gfx and not supported:
+            print(f"\nMatched GPU: {gpu}")
+            print(f"Architecture: {arch_name} ({gfx})")
+            print("Status: NOT YET SUPPORTED - Coming in future updates")
+            return None
+    
+    # If we found AMD GPUs but couldn't match them
+    print("\nGPU(s) found but architecture could not be identified.")
+    print("Only RDNA1, RDNA2, RDNA3, and RDNA4 architectures are supported.")
+    print("Please check if your GPU is compatible with ROCm.")
+    return None
 
 if __name__ == "__main__":
-    gfx = detect_gpu()
-    if gfx:
-        print(gfx)
-        sys.exit(0)
-    else:
+    try:
+        gfx = detect_gpu()
+        if gfx:
+            print(f"\n{gfx}")
+            sys.exit(0)
+        else:
+            sys.exit(1)
+    except Exception as e:
+        print(f"Fatal error during GPU detection: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
