@@ -4,9 +4,14 @@ Windows-only version of ComfyUI which uses AMD's official ROCm and PyTorch libra
 
 (Supported GPUs atm : RDNA1, RDNA2 (everything except mobile GPUs and APUs) , RDNA3 and RDNA4)
 
+# NEW #
+* Added RDNA1 support.
+* Make gpu detection better for windows 11.
+* Added flash-attention.
+* Added full python integration into embedded for better compiling (sage-attention etc needs these files)
+
 ### Important Note
 **DON'T INSTALL** into your user directory or inside Windows or Program Files directories. Don't install to a directory with non-English characters. Best option is to install to the root directory of whichever drive you'd like.
-* Added RDNA1 support.
 
 ## Installation (Windows-Only)
 
