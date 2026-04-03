@@ -6,7 +6,7 @@ Windows-only version of ComfyUI which uses AMD's official ROCm and PyTorch libra
 
 # NEW #
 * Added RDNA1 support.
-* Make gpu detection better for windows 11.
+* Made gpu detection better for windows 11.
 * Added flash-attention.
 * Added full python integration into embedded for better compiling (sage-attention etc needs these files)
 * Added advanced settings into `comfyui-rocm.bat` At default they would work without problems, you can modify if you know what you are doing.
