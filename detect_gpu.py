@@ -36,7 +36,7 @@ GPU_TO_GFX = [
     (['rx 5500', 'radeon pro v520'], 'gfx101X', 'RDNA 1', True),
     
     # Data Center / Enterprise GPUs
-    (['radeon pro vii', 'radeon pro vii'], 'gfx90X', 'Radeon Pro VII', True),
+    (['radeon pro vii'], 'gfx90X', 'Radeon Pro VII', True),
     (['mi300a', 'mi300x', 'mi325x'], 'gfx94X', 'MI300/MI325', True),
     (['mi350x', 'mi355x'], 'gfx950', 'MI350/MI355', True),
 ]

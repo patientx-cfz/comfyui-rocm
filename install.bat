@@ -275,7 +275,7 @@ if "!arch!"=="gfx94X" (
     if errorlevel 1 (
         echo [!] Warning: rocm-sdk init failed, continuing anyway...
     )
-	echo [*] Installing PyTorch for Radeon Pro VII ^(gfx90X^)...
+	echo [*] Installing PyTorch for MI300/MI325 ^(gfx94X^)...
     .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2-staging/gfx94X-dcgpu/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1
     if errorlevel 1 goto :install_failed
     goto :install_requirements
@@ -368,8 +368,6 @@ goto :bnb_done
 echo No compatible bitsandbytes build for !arch!
 
 :bnb_done
-
-if errorlevel 1 goto :install_failed
 
 echo [*] Installing flash-attention if available...
 
