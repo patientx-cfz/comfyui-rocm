@@ -337,35 +337,18 @@ curl -sL -o python_env\Lib\site-packages\sageattention\quant_per_block.py https:
 
 echo [*] Installing bitsandbytes if available...
 
-set "install_bnb_new=0"
-
-REM ---- check newer supported architectures ----
-for %%G in (gfx90X gfx94X gfx950 gfx110X gfx1150 gfx1151 gfx1152 gfx1153 gfx120X) do (
-    if /I "!arch!"=="%%G" set "install_bnb_new=1"
+:: Skip unsupported architectures (MI300/MI350 series)
+for %%G in (gfx90X gfx94X gfx950) do (
+    if /I "!arch!"=="%%G" (
+        echo [*] Skipping bitsandbytes for !arch! - not supported
+        goto :bnb_done
+    )
 )
 
-REM ---- check gfx103x family safely ----
-if /I "!arch:~0,6!"=="gfx103" (
-    echo [*] Installing bitsandbytes for gfx103x...
-    .\python_env\python.exe -m pip install https://github.com/0xDELUXA/bitsandbytes_win_rocm/releases/download/v0.49.2.dev0-py312-rocm7.12/bitsandbytes-0.49.2.dev0-cp312-cp312-win_amd64.whl --quiet
-    if errorlevel 1 goto :install_failed
-    goto :bnb_done
-)
-
-REM ---- install multi-arch build if matched ----
-if /I "!install_bnb_new!"=="1" goto :install_bnb_new
-
-goto :after_bnb_new
-
-:install_bnb_new
-echo [*] Installing bitsandbytes (multi-arch build)...
-.\python_env\python.exe -m pip install https://github.com/0xDELUXA/bitsandbytes_win_rocm/releases/download/v0.49.2.dev0-py312-rocm7.12-all/bitsandbytes-0.49.2.dev0-cp312-cp312-win_amd64.whl --quiet
+:: Install unified RDNA build
+echo [*] Installing bitsandbytes (unified RDNA build)...
+.\python_env\python.exe -m pip install https://github.com/0xDELUXA/bitsandbytes_win_rocm/releases/download/0.50.0.dev0-py3-rocm7-win_amd64_rdna/bitsandbytes-0.50.0.dev0-cp312-cp312-win_amd64.whl --quiet
 if errorlevel 1 goto :install_failed
-goto :bnb_done
-
-:after_bnb_new
-
-echo No compatible bitsandbytes build for !arch!
 
 :bnb_done
 
