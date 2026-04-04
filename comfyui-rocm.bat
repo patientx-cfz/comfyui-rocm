@@ -32,14 +32,10 @@ if "!IS_LEGACY_GPU!"=="1" (
 
 :: ------------------------- cache and database paths (relative) ------------------------::
 
-set "TRITON_CACHE_DIR=%~dp0triton-cache"
-
-:: if you already have a previous triton cache you can define it here so you won't have to rebuild it.
-
-set "MIOPEN_SYSTEM_DB_PATH=%~dp0python_env\Lib\site-packages\_rocm_sdk_devel\bin"
-set "ROCBLAS_TENSILE_DB_PATH=%~dp0python_env\Lib\site-packages\_rocm_sdk_devel\bin\rocblas"
-set "ROCBLAS_TENSILE_LIBPATH=%~dp0python_env\Lib\site-packages\_rocm_sdk_devel\bin\rocblas\library"
 set "PYTORCH_TUNABLEOP_CACHE_DIR=%~dp0tunableop-cache"
+
+set "TRITON_CACHE_DIR=%~dp0triton-cache"
+:: if you already have a previous triton cache you can define it here so you won't have to rebuild it.
 
 if not exist "%TRITON_CACHE_DIR%" (
     mkdir "%TRITON_CACHE_DIR%"
@@ -47,6 +43,13 @@ if not exist "%TRITON_CACHE_DIR%" (
 
 if not exist "%PYTORCH_TUNABLEOP_CACHE_DIR%" (
     mkdir "%PYTORCH_TUNABLEOP_CACHE_DIR%"
+)
+
+:: Skip MIOpen and ROCBlas paths for gfx1100 (RDNA3) - not present atm
+if /I NOT "!GPU_ARCH!"=="gfx1100" (
+    set "MIOPEN_SYSTEM_DB_PATH=%~dp0python_env\Lib\site-packages\_rocm_sdk_devel\bin"
+    set "ROCBLAS_TENSILE_DB_PATH=%~dp0python_env\Lib\site-packages\_rocm_sdk_devel\bin\rocblas"
+    set "ROCBLAS_TENSILE_LIBPATH=%~dp0python_env\Lib\site-packages\_rocm_sdk_devel\bin\rocblas\library"
 )
 
 :: ------------------------------------------------------------------------------------- ::
