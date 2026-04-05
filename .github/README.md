@@ -2,6 +2,8 @@
 
 Windows-only version of ComfyUI which uses AMD's official ROCm and PyTorch libraries to get better performance with AMD GPUs.
 
+- [auto-installation and popular performance enhancing packages like triton * sage-attention * flash-attention * bitsandbytes included ]
+
 (Supported GPUs atm : RDNA1, RDNA2 (everything except mobile GPUs and APUs) , RDNA3 and RDNA4)
 
 # NEW #
