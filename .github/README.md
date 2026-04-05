@@ -7,10 +7,10 @@ Windows-only version of ComfyUI which uses AMD's official ROCm and PyTorch libra
 # NEW #
 * Added RDNA1 support.
 * Made gpu detection better for windows 11.
-* Added flash-attention.
 * Added full python integration into embedded for better compiling (sage-attention etc needs these files)
 * Added advanced settings into `comfyui-rocm.bat` At default they would work without problems, you can modify if you know what you are doing.
 * Disabled comfy-aimdo check which keeps giving the same error about being nvidia only, useless for amd at the moment. aimdo is still installed and this was just a warning that shows up each time.
+* flash-attention now available for all rdna gpus.
 
 ### Important Note
 **DON'T INSTALL** into your user directory or inside Windows or Program Files directories. Don't install to a directory with non-English characters. Best option is to install to the root directory of whichever drive you'd like.
