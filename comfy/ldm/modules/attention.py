@@ -662,23 +662,33 @@ def attention3_sage(q, k, v, heads, mask=None, attn_precision=None, skip_reshape
 
     return out
 
-try:
-    @torch.library.custom_op("flash_attention::flash_attn", mutates_args=())
+_is_rdna1_or_rdna2 = (
+    torch.version.hip is not None and
+    torch.cuda.is_available() and
+    torch.cuda.get_device_properties(0).gcnArchName.startswith(("gfx101", "gfx102", "gfx103"))
+)
+
+if not _is_rdna1_or_rdna2:
+    try:
+        @torch.library.custom_op("flash_attention::flash_attn", mutates_args=())
+        def flash_attn_wrapper(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor,
+                        dropout_p: float = 0.0, causal: bool = False) -> torch.Tensor:
+            return flash_attn_func(q, k, v, dropout_p=dropout_p, causal=causal)
+
+        @flash_attn_wrapper.register_fake
+        def flash_attn_fake(q, k, v, dropout_p=0.0, causal=False):
+            # Output shape is the same as q
+            return q.new_empty(q.shape)
+    except AttributeError as error:
+        FLASH_ATTN_ERROR = error
+
+        def flash_attn_wrapper(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor,
+                        dropout_p: float = 0.0, causal: bool = False) -> torch.Tensor:
+            assert False, f"Could not define flash_attn_wrapper: {FLASH_ATTN_ERROR}"
+else:
     def flash_attn_wrapper(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor,
                     dropout_p: float = 0.0, causal: bool = False) -> torch.Tensor:
         return flash_attn_func(q, k, v, dropout_p=dropout_p, causal=causal)
-
-
-    @flash_attn_wrapper.register_fake
-    def flash_attn_fake(q, k, v, dropout_p=0.0, causal=False):
-        # Output shape is the same as q
-        return q.new_empty(q.shape)
-except AttributeError as error:
-    FLASH_ATTN_ERROR = error
-
-    def flash_attn_wrapper(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor,
-                    dropout_p: float = 0.0, causal: bool = False) -> torch.Tensor:
-        assert False, f"Could not define flash_attn_wrapper: {FLASH_ATTN_ERROR}"
 
 @wrap_attn
 def attention_flash(q, k, v, heads, mask=None, attn_precision=None, skip_reshape=False, skip_output_reshape=False, **kwargs):

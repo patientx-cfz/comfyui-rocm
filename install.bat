@@ -337,10 +337,10 @@ curl -sL -o python_env\Lib\site-packages\sageattention\quant_per_block.py https:
 
 echo [*] Installing bitsandbytes if available...
 
-:: Skip unsupported architectures (MI300/MI350 series)
+:: Skip unsupported architectures (MI300/MI350 series) as they are not supported by prebuilt wheels
 for %%G in (gfx90X gfx94X gfx950) do (
     if /I "!arch!"=="%%G" (
-        echo [*] Skipping bitsandbytes for !arch! - not supported
+        echo [*] Skipping bitsandbytes for !arch! - prebuilt wheels are not available, build from source required
         goto :bnb_done
     )
 )
@@ -365,7 +365,13 @@ goto :fa_done
 :install_fa
 echo [*] Installing flash-attention for !arch!...
 .\python_env\python.exe -m pip install https://github.com/0xDELUXA/flash-attention/releases/download/v2.8.4_win-rocm/flash_attn-2.8.4-py3-none-any.whl --no-deps --quiet
-if errorlevel 1 echo [!] Warning: flash-attention install failed, skipping...
+if errorlevel 1 (
+    echo [!] Warning: flash-attention install failed, skipping...
+    goto :fa_done
+)
+echo [*] Installing aiter triton backend...
+.\python_env\python.exe -m pip install https://github.com/0xDELUXA/flash-attention/releases/download/v2.8.4_win-rocm/amd_aiter-0.0.0-py3-none-win_amd64.whl --quiet
+if errorlevel 1 echo [!] Warning: aiter install failed, flash-attention will run without it...
 
 :fa_done
 
