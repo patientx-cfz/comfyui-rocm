@@ -18,6 +18,8 @@ venv*/
 !/web/extensions/core/
 /tests-ui/data/object_info.json
 /user/
+/triton-cache/
+/python_env/
 *.log
 web_custom_versions/
 .DS_Store
