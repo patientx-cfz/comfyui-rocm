@@ -14,11 +14,37 @@ _in_native_warn = threading.local()
 
 from rich.theme import Theme
 from rich.logging import RichHandler
+from rich.highlighter import RegexHighlighter, ReprHighlighter
 from rich.panel import Panel
 from rich.text import Text
 from rich.console import Console
 from rich.pretty import install as pretty_install
 from rich.traceback import install as traceback_install
+
+
+class _ComfyHighlighter(ReprHighlighter):
+    """ReprHighlighter extended with ComfyUI / ML domain keyword colors."""
+    highlights = ReprHighlighter.highlights + [
+        r"(?P<ml_latent>\blatents?\b)",
+        r"(?P<ml_sampler>\bsamplers?\b)",
+        r"(?P<ml_sigma>\bsigmas?\b)",
+        r"(?P<ml_scheduler>\bschedulers?\b)",
+        r"(?P<ml_model>\bmodel\b)",
+        r"(?P<ml_checkpoint>\bcheckpoint\b)",
+        r"(?P<ml_lora>\blora\b)",
+        r"(?P<ml_vae>\bvae\b)",
+        r"(?P<ml_clip>\bclip\b)",
+        r"(?P<ml_unet>\bunet\b)",
+        r"(?P<ml_cfg>\bcfg\b)",
+        r"(?P<ml_denoise>\bdenoise(?:d|r)?\b)",
+        r"(?P<ml_tensor>\btensor\b)",
+        r"(?P<ml_device>\bdevice\b)",
+        r"(?P<ml_node>\bnode\b)",
+        r"(?P<ml_step>\bsteps?\b)",
+        r"(?P<ml_cond>\bconds?\b)",
+        r"(?P<ml_noise>\bnoise\b)",
+        r"(?P<ml_seed>\bseed\b)",
+    ]
 
 
 class _BracketedRichHandler(RichHandler):
@@ -139,9 +165,29 @@ def setup_logger(log_level: str = '[INFO]', capacity: int = 300, use_stdout: boo
         "repr.attrib_name":       "color(150)",         # pale green    — tag attributes
         "repr.attrib_value":      "color(222)",         # pale yellow
         "repr.call":              "color(147)",         # periwinkle    — function calls
+        # ML domain keywords
+        "ml_latent":     "color(141)",   # violet      — latent/latents
+        "ml_sampler":    "color(87)",    # light cyan  — sampler/samplers
+        "ml_sigma":      "color(80)",    # teal        — sigma/sigmas
+        "ml_scheduler":  "color(147)",   # periwinkle  — scheduler
+        "ml_model":      "color(214)",   # orange      — model
+        "ml_checkpoint": "color(215)",   # gold        — checkpoint
+        "ml_lora":       "color(213)",   # pink        — lora
+        "ml_vae":        "color(83)",    # lime green  — vae
+        "ml_clip":       "color(117)",   # sky blue    — clip
+        "ml_unet":       "color(183)",   # lavender    — unet
+        "ml_cfg":        "color(220)",   # amber       — cfg
+        "ml_denoise":    "color(210)",   # coral       — denoise
+        "ml_tensor":     "color(177)",   # plum        — tensor
+        "ml_device":     "color(110)",   # slate blue  — device
+        "ml_node":       "color(229)",   # pale yellow — node
+        "ml_step":       "color(76)",    # forest green — step/steps
+        "ml_cond":       "color(159)",   # powder blue  — cond/conds
+        "ml_noise":      "color(246)",   # mid grey    — noise
+        "ml_seed":       "color(222)",   # pale yellow — seed
         # Tracebacks
-        "traceback.border":              "color(22)",
-        "traceback.border.syntax_error": "color(124)",
+        "traceback.border":              "color(196)",
+        "traceback.border.syntax_error": "bold color(196)",
         "traceback.exc_type":            "bold color(196)",
         "traceback.exc_value":           "color(203)",
     })
@@ -163,6 +209,7 @@ def setup_logger(log_level: str = '[INFO]', capacity: int = 300, use_stdout: boo
         show_level=True,
         show_path=False,
         markup=False,
+        highlighter=_ComfyHighlighter(),
         rich_tracebacks=True,
         tracebacks_show_locals=False,
         log_time_format="[%H:%M:%S]",
@@ -182,6 +229,7 @@ def setup_logger(log_level: str = '[INFO]', capacity: int = 300, use_stdout: boo
             show_level=True,
             show_path=False,
             markup=False,
+            highlighter=_ComfyHighlighter(),
             rich_tracebacks=True,
             log_time_format="[%H:%M:%S]",
             level=level,
