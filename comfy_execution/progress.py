@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-from typing import TypedDict, Dict, Optional, Tuple
+from typing import TypedDict, Dict, Optional, Tuple, Any
 from typing_extensions import override
 from PIL import Image
 from enum import Enum
 from abc import ABC
-from tqdm import tqdm
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from comfy_execution.graph import DynamicPrompt
@@ -79,24 +78,41 @@ class ProgressHandler(ABC):
 
 class CLIProgressHandler(ProgressHandler):
     """
-    Handler that displays progress using tqdm progress bars in the CLI.
+    Handler that displays progress using rich progress bars in the CLI.
     """
 
     def __init__(self):
         super().__init__("cli")
-        self.progress_bars: Dict[str, tqdm] = {}
+        self._progress: Any = None
+        self._tasks: Dict[str, Any] = {}
+
+    def _ensure_progress(self) -> Any:
+        if self._progress is None:
+            from rich.progress import (
+                Progress, BarColumn, TextColumn,
+                TimeElapsedColumn, TimeRemainingColumn, TaskProgressColumn,
+            )
+            try:
+                from app.logger import console as _console
+            except Exception:
+                _console = None
+            self._progress = Progress(
+                TextColumn("[color(28)][[{task.description}]][/]"),
+                BarColumn(bar_width=None, style="color(28)", complete_style="color(46)", finished_style="color(28)"),
+                TaskProgressColumn(style="color(46)"),
+                TimeElapsedColumn(),
+                TimeRemainingColumn(),
+                console=_console,
+                transient=False,
+            )
+            self._progress.start()
+        return self._progress
 
     @override
     def start_handler(self, node_id: str, state: NodeProgressState, prompt_id: str):
-        # Create a new tqdm progress bar
-        if node_id not in self.progress_bars:
-            self.progress_bars[node_id] = tqdm(
-                total=state["max"],
-                desc=f"Node {node_id}",
-                unit="steps",
-                leave=True,
-                position=len(self.progress_bars),
-            )
+        p = self._ensure_progress()
+        if node_id not in self._tasks:
+            self._tasks[node_id] = p.add_task(f"Node {node_id}", total=state["max"])
 
     @override
     def update_handler(
@@ -108,43 +124,27 @@ class CLIProgressHandler(ProgressHandler):
         prompt_id: str,
         image: PreviewImageTuple | None = None,
     ):
-        # Handle case where start_handler wasn't called
-        if node_id not in self.progress_bars:
-            self.progress_bars[node_id] = tqdm(
-                total=max_value,
-                desc=f"Node {node_id}",
-                unit="steps",
-                leave=True,
-                position=len(self.progress_bars),
-            )
-            self.progress_bars[node_id].update(value)
-        else:
-            # Update existing progress bar
-            if max_value != self.progress_bars[node_id].total:
-                self.progress_bars[node_id].total = max_value
-            # Calculate the update amount (difference from current position)
-            current_position = self.progress_bars[node_id].n
-            update_amount = value - current_position
-            if update_amount > 0:
-                self.progress_bars[node_id].update(update_amount)
+        p = self._ensure_progress()
+        if node_id not in self._tasks:
+            self._tasks[node_id] = p.add_task(f"Node {node_id}", total=max_value)
+        p.update(self._tasks[node_id], completed=value, total=max_value)
 
     @override
     def finish_handler(self, node_id: str, state: NodeProgressState, prompt_id: str):
-        # Complete and close the progress bar if it exists
-        if node_id in self.progress_bars:
-            # Ensure the bar shows 100% completion
-            remaining = state["max"] - self.progress_bars[node_id].n
-            if remaining > 0:
-                self.progress_bars[node_id].update(remaining)
-            self.progress_bars[node_id].close()
-            del self.progress_bars[node_id]
+        if self._progress is not None and node_id in self._tasks:
+            self._progress.update(self._tasks[node_id], completed=state["max"])
+            self._progress.remove_task(self._tasks[node_id])
+            del self._tasks[node_id]
+            if not self._tasks:
+                self._progress.stop()
+                self._progress = None
 
     @override
     def reset(self):
-        # Close all progress bars
-        for bar in self.progress_bars.values():
-            bar.close()
-        self.progress_bars.clear()
+        if self._progress is not None:
+            self._progress.stop()
+            self._progress = None
+        self._tasks.clear()
 
 
 class WebUIProgressHandler(ProgressHandler):
