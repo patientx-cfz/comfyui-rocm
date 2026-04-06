@@ -57,9 +57,9 @@ if /I NOT "!GPU_ARCH!"=="gfx1100" (
 :: ------------------- CHANGE THESE IF YOU KNOW WHAT YOU ARE DOING --------------------- ::
 :: ---------------------- advanced settings (miopen , triton etc.) --------------------- ::
 
-set FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
-set TRITON_PRINT_AUTOTUNING=1
-set TRITON_CACHE_AUTOTUNING=1
+set FLASH_ATTENTION_TRITON_AMD_ENABLE=FALSE
+set TRITON_PRINT_AUTOTUNING=0
+set TRITON_CACHE_AUTOTUNING=0
 
 :: ------------------------------------------------------------------------------------- ::
 
