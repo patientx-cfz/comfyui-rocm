@@ -25,7 +25,7 @@ GPU_TO_GFX = [
     (['rx 6800m'], 'gfx103X', 'RDNA 2', False),
     (['rx 6800s', 'rx 6700s'], 'gfx103X', 'RDNA 2', True),
     (['rx 6950', 'rx 6900', 'rx 6800', 'w6800'], 'gfx103X', 'RDNA 2', True),
-    (['rx 6850', 'rx 6750', 'rx 6700'], 'gfx103X', 'RDNA 2', False),
+    (['rx 6850', 'rx 6750', 'rx 6700'], 'gfx103X', 'RDNA 2', True),
     (['rx 6650', 'rx 6600', 'w6600'], 'gfx103X', 'RDNA 2', True),
     (['rx 6550', 'rx 6500', 'w6500', 'rx 6450', 'rx 6400', 'w6400', 'rx 6300', 'w6300'], 'gfx103X', 'RDNA 2', False),
     (['680m', '660m'], 'gfx103X', 'RDNA 2', False),
