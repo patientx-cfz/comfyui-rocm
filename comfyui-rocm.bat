@@ -7,8 +7,12 @@ set "PYTHON_DIR=%~dp0python_env"
 set "PATH=%PYTHON_DIR%;%PYTHON_DIR%\Scripts;%PATH%"
 
 .\python_env\scripts\rocm-sdk init >nul 2>&1
+if errorlevel 1 (
+    echo [!] Warning: rocm-sdk init failed. ROCm may not be set up correctly.
+)
 
 for /f "delims=" %%i in ('rocm-sdk path --root') do set "HIP_PATH=%%i"
+set "ROCM_PATH=%HIP_PATH%"
 
 :: ------------------- detect GPU architecture for conditional settings ---------------- ::
 
