@@ -319,6 +319,7 @@ cd custom_nodes
 if not exist comfyui-manager git clone https://github.com/Comfy-Org/ComfyUI-Manager --quiet
 if not exist CFZ-SwitchMenu git clone https://github.com/patientx/CFZ-SwitchMenu.git --quiet
 if not exist CFZ-Caching git clone https://github.com/patientx/CFZ-Caching --quiet
+if not exist ComfyUI-HFRemoteVae git clone https://github.com/kijai/ComfyUI-HFRemoteVae --quiet
 cd ..
 
 echo [*] Installing triton - sageattention(v1)
