@@ -37,7 +37,8 @@ Windows-only version of ComfyUI which uses AMD's official ROCm and PyTorch libra
 2) Download and install Visual C++ Runtime Library, available from [https://aka.ms/vs/17/release/vc_redist.x64.exe](https://aka.ms/vs/17/release/vc_redist.x64.exe)
 3) Download and install Visual Studio Build Tools, available from [https://aka.ms/vs/17/release/vs_BuildTools.exe](https://aka.ms/vs/17/release/vs_BuildTools.exe)
 4) Download the latest package from here `https://github.com/patientx-cfz/comfyui-rocm/releases` ; unzip it to a folder of your choice, (preferably root folder of your C or D drive)
-5) Run :
+5) IF YOU HAVE a cpu with an integrated graphics unit, such as 5600g please disable it from BIOS before attemting to install this fork.
+6) Run :
 
 ```bash
 install.bat
