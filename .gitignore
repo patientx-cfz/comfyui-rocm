@@ -5,8 +5,7 @@ __pycache__/
 !/input/example.png
 /models/
 /temp/
-/custom_nodes/
-!custom_nodes/example_node.py.example
+custom_nodes/CFZ-Caching/miopen_config.json
 extra_model_paths.yaml
 /.vs
 .vscode/
@@ -18,6 +17,8 @@ venv*/
 !/web/extensions/core/
 /tests-ui/data/object_info.json
 /user/
+/triton-cache/
+/python_env/
 *.log
 web_custom_versions/
 .DS_Store

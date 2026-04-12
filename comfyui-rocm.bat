@@ -61,17 +61,11 @@ if /I NOT "!GPU_ARCH!"=="gfx1100" (
 :: ------------------- CHANGE THESE IF YOU KNOW WHAT YOU ARE DOING --------------------- ::
 :: ---------------------- advanced settings (miopen , triton etc.) --------------------- ::
 
-set COMFYUI_ENABLE_MIOPEN=0
 set FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE
-set MIOPEN_FIND_ENFORCE=1
-set MIOPEN_FIND_MODE=2
-set MIOPEN_DEBUG_DISABLE_FIND_DB=0
-set MIOPEN_SEARCH_CUTOFF=1
-set MIOPEN_ENABLE_LOGGING=0
-set MIOPEN_LOG_LEVEL=0
-set MIOPEN_ENABLE_LOGGING_CMD=0
 set TRITON_PRINT_AUTOTUNING=0
 set TRITON_CACHE_AUTOTUNING=0
+set TORCHINDUCTOR_MAX_AUTOTUNE_GEMM=0
+set PYTORCH_TUNABLEOP_ENABLED=0
 
 :: ------------------------------------------------------------------------------------- ::
 
@@ -88,6 +82,10 @@ if "!IS_LEGACY_GPU!"=="1" set "PARAMS=%PARAMS% --use-quad-cross-attention"
 echo ::: [comfyui-rocm] starting with these parameters ::: 
 echo [ !PARAMS! ]
 echo.
+
+:: sync requirements on every run (skips already-installed packages quickly)
+python_env\python.exe -m pip install -r requirements.txt --no-warn-script-location -q
+
 python_env\python.exe main.py %PARAMS%
 
 pause
