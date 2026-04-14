@@ -145,21 +145,21 @@ if "!arch!"=="" (
 echo [*] Detected GPU architecture: !ARCH_NAME! ^(!arch!^)
 
 :: gfx120X requires --pre
-if "!arch!"=="gfx120X" set "PIP_PRE=true"
+if "!arch!"=="gfx120X" set "FLAG=--pre"
 
 :: Build full URL
-set "PIP_INDEX_URL=https://rocm.nightlies.amd.com/v2/!ARCH_INDEX!"
+set "FULL_INDEX_URL=https://rocm.nightlies.amd.com/v2/!ARCH_INDEX!"
 
 :: Install with index override
-echo [*] Installing ROCm and PyTorch for !ARCH_NAME! ^(!arch!^)...
-.\python_env\python.exe -m pip install torch torchaudio torchvision
+echo [*] Installing ROCm and PyTorch from !FULL_INDEX_URL! ...
+.\python_env\python.exe -m pip install -i !FULL_INDEX_URL! torch torchaudio torchvision !FLAG!
 if errorlevel 1 goto :install_failed
 
 :: Wait for installation
 timeout /t 1 /nobreak >nul 2>&1
 
-echo [*] Checking ROCm installation...
-.\python_env\python.exe -m pip install rocm[libraries,devel]
+echo [*] Checking ROCm SDK full installation...
+.\python_env\python.exe -m pip install -i !FULL_INDEX_URL! rocm[libraries,devel]
 if errorlevel 1 goto :install_failed
 
 echo [*] Initializing rocm-sdk...
