@@ -1,6 +1,10 @@
 @echo off
 cls
 setlocal enabledelayedexpansion
+set "PIP_REQUIRE_VIRTUALENV=false"
+set "PIP_NO_WARN_SCRIPT_LOCATION=true"
+set "PIP_QUIET=true"
+
 title comfyui-rocm Installer
 echo ====================================================
 echo        comfyui-rocm - Automatic Installer
@@ -19,7 +23,7 @@ echo [*] [1/7] Downloading Python 3.12 Embeddable...
 if not exist "python_env" mkdir "python_env"
 curl -L "https://www.python.org/ftp/python/3.12.9/python-3.12.9-embed-amd64.zip" -o "python_embed.zip" >nul 2>&1
 if errorlevel 1 (
-    echo [!] Error: Failed to download Python embeddable
+    echo [^^!] Error: Failed to download Python embeddable
     pause
     exit /b 1
 )
@@ -28,7 +32,7 @@ if errorlevel 1 (
 echo [*] [2/7] Downloading Python development files...
 curl -L https://www.python.org/ftp/python/3.12.9/python-3.12.9-amd64.zip -o python_full.zip >nul 2>&1
 if errorlevel 1 (
-    echo [!] Error: Failed to download Python installer
+    echo [^^!] Error: Failed to download Python installer
     del "python_embed.zip" >nul 2>&1
     pause
     exit /b 1
@@ -38,7 +42,7 @@ if errorlevel 1 (
 echo [*] [3/7] Extracting Python runtime...
 tar -xf "python_embed.zip" -C "python_env" >nul 2>&1
 if errorlevel 1 (
-    echo [!] Error: Failed to extract Python
+    echo [^^!] Error: Failed to extract Python
     pause
     exit /b 1
 )
@@ -57,14 +61,14 @@ if exist "pythonfull\include" (
     xcopy "pythonfull\include" "python_env\include\" /E /I /Q >nul 2>&1
     echo [*] - Headers copied
 ) else (
-    echo [!] Warning: Headers not found
+    echo [^^!] Warning: Headers not found
 )
 
 if exist "pythonfull\libs" (
     xcopy "pythonfull\libs" "python_env\libs\" /E /I /Q >nul 2>&1
     echo [*] - Libraries copied
 ) else (
-    echo [!] Warning: Libs not found
+    echo [^^!] Warning: Libs not found
 )
 
 :: Also copy the full Lib folder for completeness
@@ -90,22 +94,22 @@ echo import site
 echo [*] [7/7] Installing Pip and build tools...
 curl -L "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py" >nul 2>&1
 if errorlevel 1 (
-    echo [!] Error: Failed to download get-pip.py
+    echo [^^!] Error: Failed to download get-pip.py
     pause
     exit /b 1
 )
-.\python_env\python.exe get-pip.py --no-warn-script-location >nul 2>&1
+.\python_env\python.exe get-pip.py --no-warn-script-location
 if errorlevel 1 (
-    echo [!] Error: Failed to install pip
+    echo [^^!] Error: Failed to install pip
     pause
     exit /b 1
 )
 del "get-pip.py"
 
 :: Install build tools
-.\python_env\python.exe -m pip install --upgrade pip setuptools wheel --no-warn-script-location >nul 2>&1
+.\python_env\python.exe -m pip install --upgrade pip setuptools wheel --no-warn-script-location
 if errorlevel 1 (
-    echo [!] Error: Failed to install build tools
+    echo [^^!] Error: Failed to install build tools
     pause
     exit /b 1
 )
@@ -121,196 +125,60 @@ echo [*] Detecting GPU...
 
 :: Check if detect_gpu.py exists
 if not exist "detect_gpu.py" (
-    echo [!] Error: detect_gpu.py not found!
+    echo [^^!] Error: detect_gpu.py not found!
     pause
     exit /b 1
 )
 
-for /f "delims=" %%A in ('.\python_env\python.exe detect_gpu.py 2^>nul') do (
-    if not "%%A"=="" (
-        set "arch=%%A"
-    )
+for /f "tokens=1,2,3 delims=|" %%A in ('.\python_env\python.exe detect_gpu.py 2^>nul') do (
+    set "arch=%%A"
+    set "ARCH_INDEX=%%B"
+    set "ARCH_NAME=%%C"
 )
 
 if "!arch!"=="" (
-    echo [!] GPU detection failed or unsupported GPU
+    echo [^^!] GPU detection failed or unsupported GPU
     pause
     exit /b 1
 )
 
-echo [*] Detected GPU architecture: !arch!
+echo [*] Detected GPU architecture: !ARCH_NAME! ^(!arch!^)
 
-:: Install PyTorch based on detected GPU
-if "!arch!"=="gfx101X" (
-    echo [*] Installing ROCm for RDNA1 ^(gfx101X^)...
-    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2-staging/gfx101X-dgpu/ --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    .\python_env\scripts\rocm-sdk init >nul 2>&1 
-    if errorlevel 1 (
-        echo [!] Warning: rocm-sdk init failed, continuing anyway...
-    )
-	echo [*] Installing PyTorch for RDNA1 ^(gfx101X^)...
-    .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2-staging/gfx101X-dgpu/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    goto :install_requirements
+:: gfx120X requires --pre
+if "!arch!"=="gfx120X" set "PIP_PRE=true"
+
+:: Build full URL
+set "PIP_INDEX_URL=https://rocm.nightlies.amd.com/v2/!ARCH_INDEX!"
+
+:: Install with index override
+echo [*] Installing ROCm and PyTorch for !ARCH_NAME! ^(!arch!^)...
+.\python_env\python.exe -m pip install torch torchaudio torchvision
+if errorlevel 1 goto :install_failed
+
+:: Wait for installation
+timeout /t 1 /nobreak >nul 2>&1
+
+echo [*] Checking ROCm installation...
+.\python_env\python.exe -m pip install rocm[libraries,devel]
+if errorlevel 1 goto :install_failed
+
+echo [*] Initializing rocm-sdk...
+.\python_env\scripts\rocm-sdk init >nul 2>&1
+if errorlevel 1 (
+    echo [^^!] Warning: rocm-sdk init failed, continuing anyway...
 )
 
-if "!arch!"=="gfx103X" (
-    echo [*] Installing ROCm for RDNA2 ^(gfx103X^)...
-    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2-staging/gfx103X-dgpu/ --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    .\python_env\scripts\rocm-sdk init >nul 2>&1 
-    if errorlevel 1 (
-        echo [!] Warning: rocm-sdk init failed, continuing anyway...
-    )
-	echo [*] Installing PyTorch for RDNA2 ^(gfx103X^)...
-    .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2-staging/gfx103X-dgpu/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    goto :install_requirements
-)
-
-if "!arch!"=="gfx110X" (
-    echo [*] Installing ROCm for RDNA3 ^(gfx110X^)...
-    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2/gfx110X-all/ --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    .\python_env\scripts\rocm-sdk init >nul 2>&1 
-    if errorlevel 1 (
-        echo [!] Warning: rocm-sdk init failed, continuing anyway...
-    )
-	echo [*] Installing PyTorch for RDNA3 ^(gfx110X^)...
-    .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2/gfx110X-all/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1	
-    if errorlevel 1 goto :install_failed
-    goto :install_requirements
-)
-
-if "!arch!"=="gfx1150" (
-    echo [*] Installing ROCm for Strix Point ^(gfx1150^)...
-    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2-staging/gfx1150/ --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    .\python_env\scripts\rocm-sdk init >nul 2>&1 
-    if errorlevel 1 (
-        echo [!] Warning: rocm-sdk init failed, continuing anyway...
-    )
-	echo [*] Installing PyTorch for Strix Point ^(gfx1150^)...
-    .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2-staging/gfx1150/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    goto :install_requirements
-)
-
-if "!arch!"=="gfx1151" (
-    echo [*] Installing ROCm for Strix Halo ^(gfx1151^)...
-    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2/gfx1151/ --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    .\python_env\scripts\rocm-sdk init >nul 2>&1 
-    if errorlevel 1 (
-        echo [!] Warning: rocm-sdk init failed, continuing anyway...
-    )
-	echo [*] Installing PyTorch for Strix Halo ^(gfx1151^)...
-    .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2/gfx1151/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1	
-    if errorlevel 1 goto :install_failed
-    goto :install_requirements
-)
-
-if "!arch!"=="gfx1152" (
-    echo [*] Installing ROCm for Krackan Point ^(gfx1152^)...
-    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2-staging/gfx1152/ --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    .\python_env\scripts\rocm-sdk init >nul 2>&1 
-    if errorlevel 1 (
-        echo [!] Warning: rocm-sdk init failed, continuing anyway...
-    )
-	echo [*] Installing PyTorch for Krackan Point ^(gfx1152^)...
-    .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2-staging/gfx1152/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1	
-    if errorlevel 1 goto :install_failed
-    goto :install_requirements
-)
-
-if "!arch!"=="gfx1153" (
-    echo [*] Installing ROCm for RDNA 3.5 ^(gfx1153^)...
-    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2-staging/gfx1153/ --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    .\python_env\scripts\rocm-sdk init >nul 2>&1 
-    if errorlevel 1 (
-        echo [!] Warning: rocm-sdk init failed, continuing anyway...
-    )
-	echo [*] Installing PyTorch for RDNA 3.5 ^(gfx1153^)...
-    .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2-staging/gfx1153/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    goto :install_requirements
-)
-
-if "!arch!"=="gfx120X" (
-    echo [*] Installing ROCm for RDNA4 ^(gfx120X^)...
-    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2/gfx120X-all/ --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    .\python_env\scripts\rocm-sdk init >nul 2>&1 
-    if errorlevel 1 (
-        echo [!] Warning: rocm-sdk init failed, continuing anyway...
-    )
-	echo [*] Installing PyTorch for RDNA4 ^(gfx120X^)...
-    .\python_env\python.exe -m pip install --pre --index-url https://rocm.nightlies.amd.com/v2/gfx120X-all/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    goto :install_requirements
-)
-
-if "!arch!"=="gfx90X" (
-    echo [*] Installing ROCm for Radeon Pro VII ^(gfx90X^)...
-    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2-staging/gfx90X-dcgpu/ --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    .\python_env\scripts\rocm-sdk init >nul 2>&1 
-    if errorlevel 1 (
-        echo [!] Warning: rocm-sdk init failed, continuing anyway...
-    )
-	echo [*] Installing PyTorch for Radeon Pro VII ^(gfx90X^)...
-    .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2-staging/gfx90X-dcgpu/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    goto :install_requirements
-)
-
-if "!arch!"=="gfx94X" (
-    echo [*] Installing ROCm for MI300/MI325 ^(gfx94X^)...
-    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2-staging/gfx94X-dcgpu/ --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    .\python_env\scripts\rocm-sdk init >nul 2>&1 
-    if errorlevel 1 (
-        echo [!] Warning: rocm-sdk init failed, continuing anyway...
-    )
-	echo [*] Installing PyTorch for MI300/MI325 ^(gfx94X^)...
-    .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2-staging/gfx94X-dcgpu/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    goto :install_requirements
-)
-
-if "!arch!"=="gfx950" (
-    echo [*] Installing ROCm for MI350/MI355 ^(gfx950^)...
-    .\python_env\python.exe -m pip install rocm[devel,libraries] --index-url https://rocm.nightlies.amd.com/v2-staging/gfx950-dcgpu/ --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    .\python_env\scripts\rocm-sdk init >nul 2>&1 
-    if errorlevel 1 (
-        echo [!] Warning: rocm-sdk init failed, continuing anyway...
-    )
-	echo [*] Installing PyTorch for MI350/MI355 ^(gfx950^)...
-    .\python_env\python.exe -m pip install --index-url https://rocm.nightlies.amd.com/v2-staging/gfx950-dcgpu/ torch torchaudio torchvision --no-warn-script-location >nul 2>&1
-    if errorlevel 1 goto :install_failed
-    goto :install_requirements
-)
-
-echo [!] Unknown GPU architecture detected: !arch!
-pause
-exit /b 1
-
-:install_requirements
 echo.
 echo [*] Installing comfyui-rocm...
 
 :: Check if requirements.txt exists
 if not exist "requirements.txt" (
-    echo [!] Error: requirements.txt not found!
+    echo [^^!] Error: requirements.txt not found!
     pause
     exit /b 1
 )
 
-.\python_env\python.exe -m pip install -r requirements.txt --no-warn-script-location >nul 2>&1
+.\python_env\python.exe -m pip install -r requirements.txt
 if errorlevel 1 goto :install_failed
 
 echo [*] Installing extensions...
@@ -323,9 +191,9 @@ if not exist ComfyUI-HFRemoteVae git clone https://github.com/kijai/ComfyUI-HFRe
 cd ..
 
 echo [*] Installing triton - sageattention(v1)
-.\python_env\python.exe -m pip install triton-windows==3.6.0.post25 --quiet
+.\python_env\python.exe -m pip install triton-windows==3.6.0.post25
 if errorlevel 1 goto :install_failed
-.\python_env\python.exe -m pip install sageattention==1.0.6 --quiet
+.\python_env\python.exe -m pip install sageattention==1.0.6
 if errorlevel 1 goto :install_failed
 
 echo [*] Patching sage-attention...
@@ -335,8 +203,6 @@ del python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block_causal.py 
 curl -sL -o python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block_causal.py https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/refs/heads/master/comfy/customzluda/sa/attn_qk_int8_per_block_causal.py
 del python_env\Lib\site-packages\sageattention\quant_per_block.py >NUL
 curl -sL -o python_env\Lib\site-packages\sageattention\quant_per_block.py https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/refs/heads/master/comfy/customzluda/sa/quant_per_block.py
-
-echo [*] Installing bitsandbytes if available...
 
 :: Skip unsupported architectures (MI300/MI350 series) as they are not supported by prebuilt wheels
 for %%G in (gfx90X gfx94X gfx950) do (
@@ -348,19 +214,19 @@ for %%G in (gfx90X gfx94X gfx950) do (
 
 :: Install unified RDNA build
 echo [*] Installing bitsandbytes (unified RDNA build)...
-.\python_env\python.exe -m pip install https://github.com/0xDELUXA/bitsandbytes_win_rocm/releases/download/0.50.0.dev0-py3-rocm7-win_amd64_rdna/bitsandbytes-0.50.0.dev0-cp312-cp312-win_amd64.whl --quiet
+.\python_env\python.exe -m pip install https://github.com/bitsandbytes-foundation/bitsandbytes/releases/download/continuous-release_main/bitsandbytes-1.33.7.preview-py3-none-win_amd64.whl
 if errorlevel 1 goto :install_failed
 
 :bnb_done
 
 echo [*] Installing flash-attention (aiter triton backend)...
-.\python_env\python.exe -m pip install https://github.com/0xDELUXA/flash-attention/releases/download/v2.8.4_win-rocm/flash_attn-2.8.4-py3-none-win_amd64.whl --quiet
+.\python_env\python.exe -m pip install https://github.com/0xDELUXA/flash-attention/releases/download/v2.8.4_win-rocm/flash_attn-2.8.4-py3-none-win_amd64.whl
 if errorlevel 1 (
-    echo [!] Warning: flash-attention install failed, skipping...
+    echo [^^!] Warning: flash-attention install failed, skipping...
     goto :fa_done
 )
-.\python_env\python.exe -m pip install https://github.com/0xDELUXA/flash-attention/releases/download/v2.8.4_win-rocm/amd_aiter-0.0.0-py3-none-win_amd64.whl --quiet
-if errorlevel 1 echo [!] Warning: aiter install failed, flash-attention will not work...
+.\python_env\python.exe -m pip install https://github.com/0xDELUXA/flash-attention/releases/download/v2.8.4_win-rocm/amd_aiter-0.0.0-py3-none-win_amd64.whl
+if errorlevel 1 echo [^^!] Warning: aiter install failed, flash-attention will not work...
 
 :fa_done
 
@@ -370,8 +236,8 @@ echo [*] Verifying installation...
 echo.
 .\python_env\python.exe -c "import torch; print(f'PyTorch Version: {torch.__version__}'); print(f'ROCm Available: {torch.cuda.is_available()}'); print(f'ROCm Version: {torch.version.hip if torch.cuda.is_available() else \"N/A\"}')"
 if errorlevel 1 (
-    echo [!] Warning: Installation verification failed
-    echo [!] PyTorch may not be properly installed
+    echo [^^!] Warning: Installation verification failed
+    echo [^^!] PyTorch may not be properly installed
 )
 
 goto :install_complete
