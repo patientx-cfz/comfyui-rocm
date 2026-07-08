@@ -688,23 +688,25 @@ if not _is_rdna1_or_rdna2:
     try:
         @torch.library.custom_op("flash_attention::flash_attn", mutates_args=())
         def flash_attn_wrapper(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor,
-                        dropout_p: float = 0.0, causal: bool = False) -> torch.Tensor:
-            return flash_attn_func(q, k, v, dropout_p=dropout_p, causal=causal)
+                        dropout_p: float = 0.0, causal: bool = False, softmax_scale: float = -1.0) -> torch.Tensor:
+            softmax_scale_arg = None if softmax_scale == -1.0 else softmax_scale
+            return flash_attn_func(q, k, v, dropout_p=dropout_p, causal=causal, softmax_scale=softmax_scale_arg)
 
         @flash_attn_wrapper.register_fake
-        def flash_attn_fake(q, k, v, dropout_p=0.0, causal=False):
+        def flash_attn_fake(q, k, v, dropout_p=0.0, causal=False, softmax_scale=-1.0):
             # Output shape is the same as q
             return q.new_empty(q.shape)
     except AttributeError as error:
         FLASH_ATTN_ERROR = error
 
         def flash_attn_wrapper(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor,
-                        dropout_p: float = 0.0, causal: bool = False) -> torch.Tensor:
+                        dropout_p: float = 0.0, causal: bool = False, softmax_scale: float = -1.0) -> torch.Tensor:
             assert False, f"Could not define flash_attn_wrapper: {FLASH_ATTN_ERROR}"
 else:
     def flash_attn_wrapper(q: torch.Tensor, k: torch.Tensor, v: torch.Tensor,
-                    dropout_p: float = 0.0, causal: bool = False) -> torch.Tensor:
-        return flash_attn_func(q, k, v, dropout_p=dropout_p, causal=causal)
+                    dropout_p: float = 0.0, causal: bool = False, softmax_scale: float = -1.0) -> torch.Tensor:
+        softmax_scale_arg = None if softmax_scale == -1.0 else softmax_scale
+        return flash_attn_func(q, k, v, dropout_p=dropout_p, causal=causal, softmax_scale=softmax_scale_arg)
 
 @wrap_attn
 def attention_flash(q, k, v, heads, mask=None, attn_precision=None, skip_reshape=False, skip_output_reshape=False, **kwargs):
@@ -1219,5 +1221,3 @@ class SpatialVideoTransformer(SpatialTransformer):
             x = self.proj_out(x)
         out = x + x_in
         return out
-
-
