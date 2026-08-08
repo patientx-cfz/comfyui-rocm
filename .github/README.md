@@ -4,7 +4,8 @@ Windows-only version of ComfyUI that uses AMD's official ROCm and PyTorch librar
 
 [includes auto-installation and popular performance-enhancing packages such as Triton, Sage Attention, Flash Attention, and bitsandbytes]
 
-- Currently supported GPUs: GCN5 /Vega, RDNA1, RDNA2 , RDNA3 and RDNA4.
+- Currently supported GPUs: GCN5 /Vega, RDNA1*, RDNA2 , RDNA3 and RDNA4.
+  * note : some 5000 series users reporting bad performance with the available rocm-pytorch packages with comfyui, for those unfortunately comfyui-zluda is the only other option, remember you can use-install both at the same PC without interfering with each other, so feel free to try both-compare 
 
 # NEWS #
 
