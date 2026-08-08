@@ -67,6 +67,12 @@ install.bat
 ## First-Time Launch
 * If you have completed every previous step correctly, it will install without errors. You can start the app with `comfyui-user.bat`. If you already have checkpoints, copy them into your `models/checkpoints` folder so you can use them with ComfyUI's default workflows. You can use [ComfyUI's Extra Model Paths YAML file](https://docs.comfy.org/development/core-concepts/models) to specify custom folders.
 
+## Keeping the app and basic rocm-pytorch packages up-to-date 
+* You always have the option to wait for new releases to appear, but it is better to use the two updater batch files :
+* `comfyui-rocm-updater.bat` : Update comfyui-rocm to the latest version, and update necessary packages if it is needed.
+*  `rocm-pytorch-package-updater.bat` : Update the rocm and pytorch packages to the latest ones available. Useful when a newer rocm-pytorch might be the solution or have some enhancements.
+*  Use the first one if you want to keep your comfyui-rocm up-to-date and use the second weekly or maybe bi-weekly to check for potential performance improvements or enhancements. (this is totally optional though)
+
 ## Troubleshooting
 ### Incompatibilities
 - DO NOT use non-English characters as folder names anywhere in the comfyui-rocm path.
