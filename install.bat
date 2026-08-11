@@ -272,19 +272,22 @@ copy comfyui-rocm.bat comfyui-user.bat /y %Q%
 :: diffusers install for hfremotevae
 .\python_env\python.exe -m pip install diffusers %QQ%
 
-echo %GREEN%[*]%RESET% Installing triton - sageattention^(v1^)...
+echo %GREEN%[*]%RESET% Installing triton (v3.7.0.post26) ...
 .\python_env\python.exe -m pip install triton-windows==3.7.0.post26 %QQ%
 if errorlevel 1 goto :install_failed
-.\python_env\python.exe -m pip install sageattention==1.0.6 %QQ%
+
+echo %GREEN%[*]%RESET% Installing sage-attention (v2.2) ...
+.\python_env\python.exe -m pip install --force-reinstall "https://github.com/patientx/sageattention-autotune/releases/download/0908/sageattention-2.2.0-py3-none-any.whl" %QQ%
 if errorlevel 1 goto :install_failed
 
-echo %GREEN%[*]%RESET% Patching sage-attention...
-del python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block.py %Q%
-curl -sL -o python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block.py https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/refs/heads/master/comfy/customzluda/sa/attn_qk_int8_per_block.py
-del python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block_causal.py %Q%
-curl -sL -o python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block_causal.py https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/refs/heads/master/comfy/customzluda/sa/attn_qk_int8_per_block_causal.py
-del python_env\Lib\site-packages\sageattention\quant_per_block.py %Q%
-curl -sL -o python_env\Lib\site-packages\sageattention\quant_per_block.py https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/refs/heads/master/comfy/customzluda/sa/quant_per_block.py
+:: patches for sage-attention 1.06
+:: echo %GREEN%[*]%RESET% Patching sage-attention...
+:: del python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block.py %Q%
+:: curl -sL -o python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block.py https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/refs/heads/master/comfy/customzluda/sa/attn_qk_int8_per_block.py
+:: del python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block_causal.py %Q%
+:: curl -sL -o python_env\Lib\site-packages\sageattention\attn_qk_int8_per_block_causal.py https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/refs/heads/master/comfy/customzluda/sa/attn_qk_int8_per_block_causal.py
+:: del python_env\Lib\site-packages\sageattention\quant_per_block.py %Q%
+:: curl -sL -o python_env\Lib\site-packages\sageattention\quant_per_block.py https://raw.githubusercontent.com/patientx/ComfyUI-Zluda/refs/heads/master/comfy/customzluda/sa/quant_per_block.py
 
 echo %GREEN%[*]%RESET% Installing bitsandbytes if available...
 
