@@ -89,7 +89,11 @@ if errorlevel 8 (
 rd /s /q "%TEMP_DIR%"
 
 echo [*] Checking Python dependencies...
-"%PYTHON%" -m pip install -r "%INSTALL_DIR%\requirements.txt" --no-warn-script-location --quiet
+
+:: Filter out torch/torchvision lines so pip never overwrites the pinned ROCm build
+"%PYTHON%" -c "import re; lines=open(r'%INSTALL_DIR%\requirements.txt').readlines(); pat=re.compile(r'^\s*(torch|torchvision|torchaudio)\s*([=<>!~]|$)', re.I); out=[l for l in lines if not pat.match(l)]; open(r'%INSTALL_DIR%\requirements_filtered.txt','w').writelines(out)"
+
+"%PYTHON%" -m pip install -r "%INSTALL_DIR%\requirements_filtered.txt" --no-warn-script-location --quiet
 if errorlevel 1 (
     echo [!] Warning: dependency update had errors. comfyui-rocm may still work.
 ) else (
