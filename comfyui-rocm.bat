@@ -90,6 +90,10 @@ set MIOPEN_LOG_LEVEL=0
 set MIOPEN_ENABLE_LOGGING_CMD=0
 set TRITON_PRINT_AUTOTUNING=0
 set TRITON_CACHE_AUTOTUNING=0
+
+:: if you are getting this error "torch.AcceleratorError: CUDA error: invalid kernel file" enable the line below by removing the "::"  
+:: set HIP_VISIBLE_DEVICES=1
+
 :: ------------------------------------------------------------------------------------- ::
 
 :: ------------------- CHANGE THESE IF YOU KNOW WHAT YOU ARE DOING --------------------- ::
