@@ -37,6 +37,9 @@ set "IS_LEGACY_GPU=0"
 if /I "!GPU_ARCH:~0,6!"=="gfx101" set "IS_LEGACY_GPU=1"
 if /I "!GPU_ARCH:~0,6!"=="gfx103" set "IS_LEGACY_GPU=1"
 
+set "IS_RDNA4_GPU=0"
+if /I "!GPU_ARCH:~0,6!"=="gfx120" set "IS_RDNA4_GPU=1"
+
 if "!GPU_ARCH!"=="" (
     echo %YELLOW%[WARN]%RESET% Could not detect GPU architecture.
 ) else (
@@ -92,8 +95,8 @@ set TRITON_PRINT_AUTOTUNING=0
 set TRITON_CACHE_AUTOTUNING=0
 
 :: if you are getting this error "torch.AcceleratorError: CUDA error: invalid kernel file" enable the line below by removing the "::"  
-:: set HIP_VISIBLE_DEVICES=1
-
+:: set HIP_VISIBLE_DEVICES=1																																	   
+							
 :: ------------------------------------------------------------------------------------- ::
 
 :: ------------------- CHANGE THESE IF YOU KNOW WHAT YOU ARE DOING --------------------- ::
@@ -103,10 +106,13 @@ set TRITON_CACHE_AUTOTUNING=0
 :: so triton-backend should be disabled for newer gpu's (it already won't activate for older gens) , if you update triton-windows to >= 3.7.1.post27 it activates itself for rdna3 and above. 
 :: if you have rdna3 or rdna4 and despite them being slower, you want to continue using native nodes, uninstall triton-windows. OR let it be disabled and use the custom node.
 
-set PARAMS=--disable-api-nodes --cache-none --disable-smart-memory --disable-pinned-memory --enable-manager --enable-manager-legacy-ui --disable-triton-backend
+set PARAMS=--disable-api-nodes --cache-lru 20 --disable-smart-memory --disable-pinned-memory --enable-manager --enable-manager-legacy-ui --disable-triton-backend
 
 :: quad-cross is better for older generation (you can use --use-sage-attention too) 
 if "!IS_LEGACY_GPU!"=="1" set "PARAMS=%PARAMS% --use-quad-cross-attention"
+
+:: ck-attention (composable kernel) is best for rdna4
+if "!IS_RDNA4_GPU!"=="1" set "PARAMS=--enable-manager --enable-manager-legacy-ui --use-ck-attention"
 
 :: ------------------------------------------------------------------------------------- ::
 
