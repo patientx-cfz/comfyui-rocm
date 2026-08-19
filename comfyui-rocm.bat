@@ -111,7 +111,7 @@ set PARAMS=--disable-api-nodes --cache-lru 20 --disable-smart-memory --disable-p
 :: quad-cross is better for older generation (you can use --use-sage-attention too) 
 if "!IS_LEGACY_GPU!"=="1" set "PARAMS=%PARAMS% --use-quad-cross-attention"
 
-:: ck-attention (composable kernel) is best for rdna4
+:: ck-attention (comfy-kitchen attention) is best for rdna4
 if "!IS_RDNA4_GPU!"=="1" set "PARAMS=--enable-manager --enable-manager-legacy-ui --use-ck-attention"
 
 :: ------------------------------------------------------------------------------------- ::
