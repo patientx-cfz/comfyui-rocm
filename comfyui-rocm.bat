@@ -118,7 +118,7 @@ if "!IS_RDNA4_GPU!"=="1" set "PARAMS=--enable-manager --enable-manager-legacy-ui
 
 :: --------------------------- keeping the necessary packages up-to-date --------------- ::
 echo %GREEN%[INFO]%RESET% Syncing tracked packages from requirements.txt...
-for %%P in (comfyui-frontend-package comfyui-workflow-templates comfyui-embedded-docs comfy-kitchen comfy-aimdo) do (
+for %%P in (comfyui-frontend-package comfyui-workflow-templates comfyui-embedded-docs comfy-kitchen comfy-aimdo av) do (
     for /f "tokens=1,2 delims==" %%A in ('findstr /i "^%%P==" "%~dp0requirements.txt"') do (
         .\python_env\python.exe -m pip show %%A 2>nul | findstr /i "^Version:" > "%TEMP%\pkgver.txt"
         set INSTALLED=
