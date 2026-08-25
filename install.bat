@@ -293,7 +293,7 @@ echo %GREEN%[*]%RESET% Installing bitsandbytes if available...
 
 :: Install bitsandbytes
 echo %GREEN%[*]%RESET% Installing bitsandbytes...
-.\python_env\python.exe -m pip install https://github.com/0xDELUXA/bitsandbytes_win_rocm/releases/download/0.50.0.dev0-py3.12-rocm7.15-win_amd64_all/bitsandbytes-0.50.0.dev0-cp312-cp312-win_amd64.whl %QQ%
+.\python_env\python.exe -m pip install https://github.com/0xDELUXA/bitsandbytes_win_rocm/releases/download/0.50.2.dev0-py3.12-rocm7.16-win_amd64_all/bitsandbytes-0.50.2.dev0-cp312-cp312-win_amd64.whl %QQ%
 if errorlevel 1 goto :install_failed
 
 :bnb_done
