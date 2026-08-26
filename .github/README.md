@@ -9,24 +9,21 @@ Windows-only version of ComfyUI that uses AMD's official ROCm and PyTorch librar
 
 # NEWS #
 
+* Added a hybrid MiniMax H3 workflow. You can get it from "sample-workflows" folder. It is using my fork of "H3 SLA Attention" node from https://github.com/ethanfel/ComfyUI-PlagueKind-Nodes-only-sparse which itself is a fork of part of PlagueKind's awesome [nodepack](https://github.com/PlagueKind/Comfyui-PlagueKind-Nodes). When used with H3 it is much faster than sage-attention WITH RDNA2 at least, you can of course try the wf with newer gpu's and find it is useful for those. Make sure to add at least ck-attention for RDNA3+ before the SLA node, that doesn't work with RDNA2 and below but is the best choice atm for newer gpus.
+ 
 * The included [ComfyUI-INT8-Fast-ROCM](https://github.com/patientx/ComfyUI-INT8-Fast-ROCM) got an important update. It now has a global "hijacker" that reroutes all int8 operations to the node's int8 kernel, so we can load int8 models and vae's through native comfyui loaders. (the custom node's loaders are still usable) It is only activated automatically below rdna3 so newer gpu's won't be forced to use it unless they use the custom laoders.
-* `rocm-pytorch-package-updater.bat` added. Easily update the rocm and pytorch packages to the latest ones available. Useful when a newer rocm-pytorch might be the solution or have some enhancements - speedups over what was installed during the first time. (Not app itself, that is still updated via `comfyui-rocm-updater.bat`) 
-* You can use int4 models & int8 clips models with the [ComfyUI-INT8-Fast-ROCM](https://github.com/patientx/ComfyUI-INT8-Fast-ROCM) (have to update it to the latest version) Details in its readme.
-* The included [ComfyUI-INT8-Fast-ROCM](https://github.com/patientx/ComfyUI-INT8-Fast-ROCM) now converts directly to a comfyui native loader compatible int8-convrot format. At the moment the native loader is either slow or have problems with AMD GPUs. So for better speed and compability with AMD just use this nodes loader. The only odd model out of all I tested was qwen-image-edit and to make it work I had to choose dtype as float32 manually. Every model I tested is faster than native loader (if one can make native loader work with patches etc). So please try the custom loader.
-  <img width="446" height="306" alt="image" src="https://github.com/user-attachments/assets/cf103398-404c-4ff7-8f92-96704e8f427d" />
-
-
-* Updated the rocm & pytorch builds to the multi-arch builds, this shouldn't cause many problems, so far only gfx942 and gfx950 doesn't seem to have windows builds yet, they are set to use the old urls for the time being.Obviously I can't test for every gpu out there so please open an issue if your gpu isn't getting recognized by this new system.
-  
-* Added my fork of the [ComfyUI-INT8-Fast](https://github.com/BobJohnson24/ComfyUI-INT8-Fast) , [ComfyUI-INT8-Fast-ROCM](https://github.com/patientx/ComfyUI-INT8-Fast-ROCM) ; which essentially lets us use int8 quantized models with triton ; one needs bf16 version of the model they need to quantize or can download various prequantized models on huggingface or civitai. With every model I've tested everyone one of them was faster -at least 25 to 40 percent- and better or identical quality then fp8 quantizations. Sage-attention can be added with models that support it by starting comfyui with --use-sage-attention or using the "patch sage attention" node from kjnodes. This really helps with the gen times.
-  
-* Added color-coding to both installer and starter bat file.
-  
-* Added logging and `--debug` option for `install.bat` 
 
 <details>
 <summary><strong> :: Older news :: </strong></summary>
 
+* `rocm-pytorch-package-updater.bat` added. Easily update the rocm and pytorch packages to the latest ones available. Useful when a newer rocm-pytorch might be the solution or have some enhancements - speedups over what was installed during the first time. (Not app itself, that is still updated via `comfyui-rocm-updater.bat`) 
+* You can use int4 models & int8 clips models with the [ComfyUI-INT8-Fast-ROCM](https://github.com/patientx/ComfyUI-INT8-Fast-ROCM) (have to update it to the latest version) Details in its readme.
+* The included [ComfyUI-INT8-Fast-ROCM](https://github.com/patientx/ComfyUI-INT8-Fast-ROCM) now converts directly to a comfyui native loader compatible int8-convrot format. At the moment the native loader is either slow or have problems with AMD GPUs. So for better speed and compability with AMD just use this nodes loader. The only odd model out of all I tested was qwen-image-edit and to make it work I had to choose dtype as float32 manually. Every model I tested is faster than native loader (if one can make native loader work with patches etc). So please try the custom loader.
+  <img width="446" height="306" alt="image" src="https://github.com/user-attachments/assets/cf103398-404c-4ff7-8f92-96704e8f427d" />
+* Updated the rocm & pytorch builds to the multi-arch builds, this shouldn't cause many problems, so far only gfx942 and gfx950 doesn't seem to have windows builds yet, they are set to use the old urls for the time being.Obviously I can't test for every gpu out there so please open an issue if your gpu isn't getting recognized by this new system.
+* Added my fork of the [ComfyUI-INT8-Fast](https://github.com/BobJohnson24/ComfyUI-INT8-Fast) , [ComfyUI-INT8-Fast-ROCM](https://github.com/patientx/ComfyUI-INT8-Fast-ROCM) ; which essentially lets us use int8 quantized models with triton ; one needs bf16 version of the model they need to quantize or can download various prequantized models on huggingface or civitai. With every model I've tested everyone one of them was faster -at least 25 to 40 percent- and better or identical quality then fp8 quantizations. Sage-attention can be added with models that support it by starting comfyui with --use-sage-attention or using the "patch sage attention" node from kjnodes. This really helps with the gen times. 
+* Added color-coding to both installer and starter bat file. 
+* Added logging and `--debug` option for `install.bat`
 * Thanks to the latest updates on [TheRock](https://github.com/ROCm/TheRock) , we now have full gpu support from gcn5/vega to the latest RDNA4 gpu's.
 * Added a simple updater, run it to keep your install of comfyui-rocm updated.
 * Added some tested workflows inside "sample-workflows" folder. Wan 2.2 i2v & ltxv2.3 distill model only and 2-stage dev model using distill lora workflows are added at the moment.
