@@ -2,6 +2,8 @@
 setlocal enabledelayedexpansion
 title [comfyui-rocm]
 
+set PYTHONUTF8=1
+
 :: ANSI color support (Windows 10+)
 for /f %%a in ('echo prompt $E ^| cmd') do set "ESC=%%a"
 set "GREEN=%ESC%[32m"
