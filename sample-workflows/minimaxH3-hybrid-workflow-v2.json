@@ -1484,10 +1484,10 @@
       "title": "custom nodes needed :",
       "properties": {},
       "widgets_values": [
-        "ComfyUI-MiniMaxH3-Easy ::\nhttps://github.com/nkxx188/ComfyUI-MiniMaxH3-Easy\nKJNodes ::\nhttps://github.com/kijai/ComfyUI-KJNodes\nH3 SLA Attention - ROCM node ::\nhttps://github.com/patientx/ComfyUI-PlagueKind-Nodes-only-sparse\n"
+        "ComfyUI-MiniMaxH3-Easy ::\nhttps://github.com/nkxx188/ComfyUI-MiniMaxH3-Easy\nKJNodes ::\nhttps://github.com/kijai/ComfyUI-KJNodes\nH3 SLA Attention - ROCM node ::\nhttps://github.com/patientx/comfyui-h3-sla-attention-rocm\n"
       ],
       "widgets_values_named": {
-        "text": "ComfyUI-MiniMaxH3-Easy ::\nhttps://github.com/nkxx188/ComfyUI-MiniMaxH3-Easy\nKJNodes ::\nhttps://github.com/kijai/ComfyUI-KJNodes\nH3 SLA Attention - ROCM node ::\nhttps://github.com/patientx/ComfyUI-PlagueKind-Nodes-only-sparse\n"
+        "text": "ComfyUI-MiniMaxH3-Easy ::\nhttps://github.com/nkxx188/ComfyUI-MiniMaxH3-Easy\nKJNodes ::\nhttps://github.com/kijai/ComfyUI-KJNodes\nH3 SLA Attention - ROCM node ::\nhttps://github.com/patientx/comfyui-h3-sla-attention-rocm\n"
       },
       "color": "#323",
       "bgcolor": "#535"
