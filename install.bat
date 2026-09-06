@@ -237,9 +237,22 @@ if !USE_LEGACY_URL!==1 (
     goto :install_requirements
 )
 
-:: For all other GPUs, use the new multi-arch URL
-echo %GREEN%[*]%RESET% Using multi-arch ROCm for %CYAN%!arch!%RESET%
-.\python_env\python.exe -m pip install "torch[device-!arch!]" "torchvision[device-!arch!]" torchaudio rocm-sdk-devel --index-url https://rocm.nightlies.amd.com/whl-multi-arch/ --no-warn-script-location %Q%
+:: gfx1250, gfx110x, gfx115x have no working device-specific packages yet
+:: on the new repo (or the old one) - not yet supported
+set "UNSUPPORTED=0"
+for %%G in (gfx1250 gfx110x gfx115x) do (
+    if /I "!arch!"=="%%G" set "UNSUPPORTED=1"
+)
+
+if !UNSUPPORTED!==1 (
+    echo %RED%[!]%RESET% Detected architecture %CYAN%!arch!%RESET% is not yet supported - no working PyTorch build available
+    pause
+    exit /b 1
+)
+
+:: All other GPUs use AMD's new nightly repo index
+echo %GREEN%[*]%RESET% Using new AMD nightly repo for %CYAN%!arch!%RESET%
+.\python_env\python.exe -m pip install "torch[device-!arch!]" "torchvision[device-!arch!]" torchaudio rocm-sdk-devel --pre --index-url https://nightly.repo.amd.com/rocm/whl-next/ --no-warn-script-location %Q%
 if errorlevel 1 goto :install_failed
 
 goto :install_requirements
