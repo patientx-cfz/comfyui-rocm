@@ -90,8 +90,13 @@ rd /s /q "%TEMP_DIR%"
 
 echo [*] Checking Python dependencies...
 
+set "PYTHONNOUSERSITE=1"
+
 :: Filter out torch/torchvision lines so pip never overwrites the pinned ROCm build
 "%PYTHON%" -c "import re; lines=open(r'%INSTALL_DIR%\requirements.txt').readlines(); pat=re.compile(r'^\s*(torch|torchvision|torchaudio)\s*([=<>!~]|$)', re.I); out=[l for l in lines if not pat.match(l)]; open(r'%INSTALL_DIR%\requirements_filtered.txt','w').writelines(out)"
+
+:: snapshot installed versions before the update
+"%PYTHON%" -m pip freeze --quiet > "%INSTALL_DIR%\_pre_freeze.txt" 2>nul
 
 "%PYTHON%" -m pip install -r "%INSTALL_DIR%\requirements_filtered.txt" --no-warn-script-location --quiet
 if errorlevel 1 (
@@ -99,6 +104,16 @@ if errorlevel 1 (
 ) else (
     echo [*] Dependencies are up to date.
 )
+
+:: snapshot again and report what actually changed
+"%PYTHON%" -m pip freeze --quiet > "%INSTALL_DIR%\_post_freeze.txt" 2>nul
+
+echo.
+echo [*] Package changes:
+"%PYTHON%" -c "import re; pat=re.compile(r'^([^=]+)==(.+)$'); pre={}; post={};[pre.update({(m:=pat.match(l.strip())) and m.group(1).lower(): m.group(2)}) for l in open(r'%INSTALL_DIR%\_pre_freeze.txt', encoding='utf-8', errors='ignore') if pat.match(l.strip())]; [post.update({(m:=pat.match(l.strip())) and m.group(1).lower(): m.group(2)}) for l in open(r'%INSTALL_DIR%\_post_freeze.txt', encoding='utf-8', errors='ignore') if pat.match(l.strip())]; changed=[(k, pre.get(k,'new'), v) for k,v in post.items() if pre.get(k)!=v]; print('  none') if not changed else [print(f'  {k}: {a} -> {b}') for k,a,b in sorted(changed)]"
+
+del "%INSTALL_DIR%\_pre_freeze.txt" 2>nul
+del "%INSTALL_DIR%\_post_freeze.txt" 2>nul
 
 :: Save remote hash so next run can detect if already current
 echo %REMOTE_HASH%> "%HASH_FILE%"
