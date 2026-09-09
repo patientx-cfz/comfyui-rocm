@@ -108,7 +108,7 @@ if !USE_LEGACY_URL!==1 (
     .\python_env\python.exe -m pip install --no-cache-dir --index-url https://rocm.nightlies.amd.com/v2-staging/!arch!-dcgpu/ torch torchaudio torchvision %Q%
     if errorlevel 1 goto :update_failed
 ) else (
-    echo %GREEN%[*]%RESET% Using multi-arch ROCm nightly for %CYAN%!arch!%RESET%
+    echo %GREEN%[*]%RESET% Using new AMD nightly repo for %CYAN%!arch!%RESET%
     .\python_env\python.exe -m pip install "torch[device-!arch!]" "torchvision[device-!arch!]" torchaudio rocm-sdk-devel --no-cache-dir --pre --index-url https://nightly.repo.amd.com/rocm/whl-next/ %Q%
     if errorlevel 1 goto :update_failed
 )
