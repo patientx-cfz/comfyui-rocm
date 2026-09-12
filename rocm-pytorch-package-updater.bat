@@ -116,6 +116,15 @@ if !USE_LEGACY_URL!==1 (
 :: -------------------------------------------------------
 :: 4. Verify
 :: -------------------------------------------------------
+
+:: Fix: AMD moved rocm_kpack.dll from _rocm_sdk_devel to _rocm_sdk_core in some builds
+if exist "python_env\Lib\site-packages\_rocm_sdk_core\bin\rocm_kpack.dll" (
+    if not exist "python_env\Lib\site-packages\_rocm_sdk_devel\bin\rocm_kpack.dll" (
+        echo %YELLOW%[*]%RESET% rocm_kpack.dll missing in _rocm_sdk_devel - copying from _rocm_sdk_core...
+        copy "python_env\Lib\site-packages\_rocm_sdk_core\bin\rocm_kpack.dll" "python_env\Lib\site-packages\_rocm_sdk_devel\bin\rocm_kpack.dll" /y %Q%
+    )
+)
+
 echo.
 echo %CYAN%------------------------------------------------------------%RESET%
 echo %CYAN%  PYTORCH CONFIGURATION%RESET%
