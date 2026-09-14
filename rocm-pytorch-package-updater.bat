@@ -111,6 +111,9 @@ if !USE_LEGACY_URL!==1 (
     echo %GREEN%[*]%RESET% Using new AMD nightly repo for %CYAN%!arch!%RESET%
     .\python_env\python.exe -m pip install "torch[device-!arch!]" "torchvision[device-!arch!]" torchaudio rocm-sdk-devel --no-cache-dir --pre --index-url https://nightly.repo.amd.com/rocm/whl-next/ %Q%
     if errorlevel 1 goto :update_failed
+    echo %GREEN%[*]%RESET% Initializing rocm-sdk...
+    .\python_env\Scripts\rocm-sdk init %Q%
+    if errorlevel 1 echo %YELLOW%[!]%RESET% Warning: rocm-sdk init failed, continuing anyway...
 )
 
 :: -------------------------------------------------------
@@ -120,6 +123,10 @@ if !USE_LEGACY_URL!==1 (
 :: Fix: AMD moved rocm_kpack.dll from _rocm_sdk_devel to _rocm_sdk_core in some builds
 if exist "python_env\Lib\site-packages\_rocm_sdk_core\bin\rocm_kpack.dll" (
     if not exist "python_env\Lib\site-packages\_rocm_sdk_devel\bin\rocm_kpack.dll" (
+        if not exist "python_env\Lib\site-packages\_rocm_sdk_devel" (
+            echo %YELLOW%[*]%RESET% _rocm_sdk_devel not expanded yet - retrying rocm-sdk init...
+            .\python_env\Scripts\rocm-sdk init %Q%
+        )
         echo %YELLOW%[*]%RESET% rocm_kpack.dll missing in _rocm_sdk_devel - copying from _rocm_sdk_core...
         copy "python_env\Lib\site-packages\_rocm_sdk_core\bin\rocm_kpack.dll" "python_env\Lib\site-packages\_rocm_sdk_devel\bin\rocm_kpack.dll" /y %Q%
     )
