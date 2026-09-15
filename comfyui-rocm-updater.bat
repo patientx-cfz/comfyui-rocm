@@ -88,6 +88,18 @@ if errorlevel 8 (
 :: Clean up temp
 rd /s /q "%TEMP_DIR%"
 
+echo [*] Updating tracked custom nodes...
+echo.
+
+set "CUSTOM_NODES_DIR=%INSTALL_DIR%\custom_nodes"
+if not exist "%CUSTOM_NODES_DIR%" mkdir "%CUSTOM_NODES_DIR%"
+
+call :UpdateCustomNode "ComfyUI-Manager" "https://github.com/Comfy-Org/ComfyUI-Manager"
+call :UpdateCustomNode "ComfyUI-INT8-Fast-ROCM" "https://github.com/patientx/ComfyUI-INT8-Fast-ROCM"
+call :UpdateCustomNode "comfyui-h3-sla-attention-rocm" "https://github.com/patientx/comfyui-h3-sla-attention-rocm"
+
+echo.
+
 echo [*] Checking Python dependencies...
 
 set "PYTHONNOUSERSITE=1"
@@ -126,3 +138,26 @@ echo  Your models, outputs, and custom_nodes were kept.
 echo ====================================================
 echo.
 pause
+goto :EOF
+
+:UpdateCustomNode
+set "NODE_NAME=%~1"
+set "NODE_URL=%~2"
+set "NODE_DIR=%CUSTOM_NODES_DIR%\%NODE_NAME%"
+
+if exist "%NODE_DIR%\.git" (
+    echo [*] Updating %NODE_NAME%...
+    git -C "%NODE_DIR%" pull --ff-only --quiet
+    if errorlevel 1 (
+        echo [!] %NODE_NAME%: git pull failed ^(local changes or diverged history^) - update it manually.
+    )
+) else if exist "%NODE_DIR%" (
+    echo [!] %NODE_NAME% exists but is not a git checkout - skipping, update it manually.
+) else (
+    echo [*] Installing %NODE_NAME%...
+    git clone --quiet "%NODE_URL%" "%NODE_DIR%"
+    if errorlevel 1 (
+        echo [!] Failed to clone %NODE_NAME%.
+    )
+)
+exit /b 0
