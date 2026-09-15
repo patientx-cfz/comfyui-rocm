@@ -295,6 +295,7 @@ if not exist CFZ-SwitchMenu git clone https://github.com/patientx/CFZ-SwitchMenu
 if not exist CFZ-Caching git clone https://github.com/patientx/CFZ-Caching %QQ%
 if not exist ComfyUI-HFRemoteVae git clone https://github.com/kijai/ComfyUI-HFRemoteVae %QQ%
 if not exist ComfyUI-INT8-Fast-ROCM git clone https://github.com/patientx/ComfyUI-INT8-Fast-ROCM %QQ%
+if not exist comfyui-h3-sla-attention-rocm git clone https://github.com/patientx/comfyui-h3-sla-attention-rocm %QQ%
 cd ..
 copy comfyui-rocm.bat comfyui-user.bat /y %Q%
 
