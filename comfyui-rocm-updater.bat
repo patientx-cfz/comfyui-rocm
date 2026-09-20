@@ -58,10 +58,9 @@ echo [*] Local  commit : %LOCAL_HASH%
 echo.
 
 if /i "%REMOTE_HASH%"=="%LOCAL_HASH%" (
-    echo [*] You are already on the latest version. Nothing to do.
+    echo [*] Core repo already on the latest version. Checking custom nodes / packages...
     echo.
-    pause
-    exit /b 0
+    goto :SkipCoreUpdate
 )
 
 echo [*] New version found - downloading...
@@ -88,6 +87,11 @@ if errorlevel 8 (
 :: Clean up temp
 rd /s /q "%TEMP_DIR%"
 
+:: Save remote hash so next run can detect if already current
+echo %REMOTE_HASH%> "%HASH_FILE%"
+
+:SkipCoreUpdate
+
 echo [*] Updating tracked custom nodes...
 echo.
 
@@ -97,6 +101,9 @@ if not exist "%CUSTOM_NODES_DIR%" mkdir "%CUSTOM_NODES_DIR%"
 call :UpdateCustomNode "ComfyUI-Manager" "https://github.com/Comfy-Org/ComfyUI-Manager"
 call :UpdateCustomNode "ComfyUI-INT8-Fast-ROCM" "https://github.com/patientx/ComfyUI-INT8-Fast-ROCM"
 call :UpdateCustomNode "comfyui-h3-sla-attention-rocm" "https://github.com/patientx/comfyui-h3-sla-attention-rocm"
+
+echo [*] Checking sageattention-autotune...
+call :UpdateSageAttention
 
 echo.
 
@@ -127,9 +134,6 @@ echo [*] Package changes:
 del "%INSTALL_DIR%\_pre_freeze.txt" 2>nul
 del "%INSTALL_DIR%\_post_freeze.txt" 2>nul
 
-:: Save remote hash so next run can detect if already current
-echo %REMOTE_HASH%> "%HASH_FILE%"
-
 echo.
 echo ====================================================
 echo  Update complete!
@@ -159,5 +163,22 @@ if exist "%NODE_DIR%\.git" (
     if errorlevel 1 (
         echo [!] Failed to clone %NODE_NAME%.
     )
+)
+exit /b 0
+
+:UpdateSageAttention
+:: sageattention-autotune isn't a git checkout - it's a wheel installed via pip.
+:: The version string (2.2.0) doesn't change between fixes, so --force-reinstall
+:: is required or pip will think it's already satisfied and skip the update.
+:: The asset filename must stay "sageattention-2.2.0-py3-none-any.whl" on every
+:: release (i.e. don't set SAGEATTENTION_WHEEL_VERSION_SUFFIX when building) or
+:: /releases/latest/download/<name> will 404.
+set "SAGE_WHEEL_URL=https://github.com/patientx/sageattention-autotune/releases/latest/download/sageattention-2.2.0-py3-none-any.whl"
+
+"%PYTHON%" -m pip install --upgrade --force-reinstall --no-deps --quiet "%SAGE_WHEEL_URL%"
+if errorlevel 1 (
+    echo [!] sageattention-autotune: update failed - check your internet connection.
+) else (
+    echo [*] sageattention-autotune is up to date.
 )
 exit /b 0
