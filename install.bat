@@ -307,7 +307,7 @@ echo %GREEN%[*]%RESET% Installing triton (v3.7.0.post26) ...
 if errorlevel 1 goto :install_failed
 
 echo %GREEN%[*]%RESET% Installing sage-attention (v2.2) ...
-.\python_env\python.exe -m pip install --force-reinstall "https://github.com/patientx/sageattention-autotune/releases/download/0908/sageattention-2.2.0-py3-none-any.whl" %QQ%
+.\python_env\python.exe -m pip install --force-reinstall "https://github.com/patientx/sageattention-autotune/releases/download/qwen21fix/sageattention-2.2.0-py3-none-any.whl" %QQ%
 if errorlevel 1 goto :install_failed
 
 :: patches for sage-attention 1.06
