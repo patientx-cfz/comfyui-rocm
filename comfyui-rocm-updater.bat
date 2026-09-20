@@ -76,6 +76,23 @@ if errorlevel 1 (
     exit /b 1
 )
 
+:: If the updater script itself changed, relaunch the new copy under a
+:: different filename before doing anything else. Robocopy below excludes
+:: our own running filename (Windows can corrupt a batch file that gets
+:: overwritten while it's still open/executing), so without this, anyone
+:: already running the old updater.bat would never receive updater changes -
+:: only files other than itself would ever get updated for them.
+if /i not "%~nx0"=="_updater_relaunch.bat" (
+    fc /b "%TEMP_DIR%\%~nx0" "%~f0" >nul 2>&1
+    if errorlevel 1 (
+        echo [*] Updater script itself changed - relaunching new version...
+        copy /y "%TEMP_DIR%\%~nx0" "%INSTALL_DIR%\_updater_relaunch.bat" >nul
+        rd /s /q "%TEMP_DIR%"
+        start "" "%INSTALL_DIR%\_updater_relaunch.bat"
+        exit /b 0
+    )
+)
+
 echo [*] Applying updates...
 
 :: robocopy exit codes 0-7 = success/partial success, 8+ = real errors
@@ -141,6 +158,7 @@ echo  Installed commit: %REMOTE_HASH%
 echo  Your models, outputs, and custom_nodes were kept.
 echo ====================================================
 echo.
+if /i "%~nx0"=="_updater_relaunch.bat" del "%~f0" >nul 2>&1
 pause
 goto :EOF
 
