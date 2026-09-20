@@ -80,7 +80,7 @@ if errorlevel 1 (
 echo [*] Applying updates...
 
 :: robocopy exit codes 0-7 = success/partial success, 8+ = real errors
-robocopy "%TEMP_DIR%" "%INSTALL_DIR%" /E /XD "%TEMP_DIR%\python_env" "%TEMP_DIR%\models" "%TEMP_DIR%\output" "%TEMP_DIR%\input" "%TEMP_DIR%\user" "%TEMP_DIR%\custom_nodes" /XF "comfyui-user.bat" /NFL /NDL /NJH /NJS
+robocopy "%TEMP_DIR%" "%INSTALL_DIR%" /E /XD "%TEMP_DIR%\python_env" "%TEMP_DIR%\models" "%TEMP_DIR%\output" "%TEMP_DIR%\input" "%TEMP_DIR%\user" "%TEMP_DIR%\custom_nodes" /XF "comfyui-user.bat" "%~nx0" /NFL /NDL /NJH /NJS
 if errorlevel 8 (
     echo [!] Robocopy reported an error. Some files may not have updated.
 )
