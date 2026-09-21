@@ -119,7 +119,7 @@ call :UpdateCustomNode "ComfyUI-Manager" "https://github.com/Comfy-Org/ComfyUI-M
 call :UpdateCustomNode "ComfyUI-INT8-Fast-ROCM" "https://github.com/patientx/ComfyUI-INT8-Fast-ROCM"
 call :UpdateCustomNode "comfyui-h3-sla-attention-rocm" "https://github.com/patientx/comfyui-h3-sla-attention-rocm"
 
-echo [*] Checking sageattention-autotune...
+echo [*] Checking sageattention...
 call :UpdateSageAttention
 
 echo.
@@ -185,18 +185,28 @@ if exist "%NODE_DIR%\.git" (
 exit /b 0
 
 :UpdateSageAttention
-:: sageattention-autotune isn't a git checkout - it's a wheel installed via pip.
-:: The version string (2.2.0) doesn't change between fixes, so --force-reinstall
+:: sageattention isn't a git checkout - it's a wheel installed via pip.
+:: The version string (2.2.0) doesn't change between rebuilds, so --force-reinstall
 :: is required or pip will think it's already satisfied and skip the update.
-:: The asset filename must stay "sageattention-2.2.0-py3-none-any.whl" on every
-:: release (i.e. don't set SAGEATTENTION_WHEEL_VERSION_SUFFIX when building) or
-:: /releases/latest/download/<name> will 404.
-set "SAGE_WHEEL_URL=https://github.com/patientx/sageattention-autotune/releases/latest/download/sageattention-2.2.0-py3-none-any.whl"
+:: gfx1201 uses the native compiled wheel; all other GPUs keep sageattention-autotune.
+:: Autotune asset filename must stay "sageattention-2.2.0-py3-none-any.whl".
+:: Native gfx1201 asset filename must stay "sageattention-2.2.0-cp312-cp312-win_amd64.whl".
+set "SAGE_ARCH="
+if exist "%INSTALL_DIR%\detect_gpu.py" (
+    for /f "delims=" %%A in ('"%PYTHON%" "%INSTALL_DIR%\detect_gpu.py" 2^>nul') do set "SAGE_ARCH=%%A"
+)
+if /I "%SAGE_ARCH%"=="gfx1201" (
+    set "SAGE_WHEEL_URL=https://github.com/thehybrid1337/sageattention-rocm-gfx1201-win/releases/latest/download/sageattention-2.2.0-cp312-cp312-win_amd64.whl"
+    set "SAGE_LABEL=sageattention native gfx1201"
+) else (
+    set "SAGE_WHEEL_URL=https://github.com/patientx/sageattention-autotune/releases/latest/download/sageattention-2.2.0-py3-none-any.whl"
+    set "SAGE_LABEL=sageattention-autotune"
+)
 
 "%PYTHON%" -m pip install --upgrade --force-reinstall --no-deps --quiet "%SAGE_WHEEL_URL%"
 if errorlevel 1 (
-    echo [!] sageattention-autotune: update failed - check your internet connection.
+    echo [!] %SAGE_LABEL%: update failed - check your internet connection.
 ) else (
-    echo [*] sageattention-autotune is up to date.
+    echo [*] %SAGE_LABEL% is up to date.
 )
 exit /b 0
