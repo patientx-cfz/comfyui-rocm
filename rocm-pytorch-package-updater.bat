@@ -29,6 +29,9 @@ set "INSTALL_DIR=%~dp0"
 if "%INSTALL_DIR:~-1%"=="\" set "INSTALL_DIR=%INSTALL_DIR:~0,-1%"
 set "PYTHON=%INSTALL_DIR%\python_env\python.exe"
 
+:: Keep the venv isolated from user-level site-packages that could shadow python_env's
+set "PYTHONNOUSERSITE=1"
+
 echo %GREEN%[*]%RESET% Install dir : %INSTALL_DIR%
 echo %GREEN%[*]%RESET% Python      : %PYTHON%
 echo.

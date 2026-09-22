@@ -22,6 +22,9 @@ title [comfyui-rocm] - !VERSION!
 set "PYTHON_DIR=%~dp0python_env"
 set "PATH=%PYTHON_DIR%;%PYTHON_DIR%\Scripts;%PATH%"
 
+:: Keep the venv isolated from user-level site-packages that could shadow python_env's
+set "PYTHONNOUSERSITE=1"
+
 echo %GREEN%[INFO]%RESET% Initializing rocm-sdk...
 .\python_env\scripts\rocm-sdk init >nul 2>&1
 if errorlevel 1 (

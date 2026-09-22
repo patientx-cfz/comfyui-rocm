@@ -60,6 +60,10 @@ if defined DEBUG (
 )
 
 title comfyui-rocm Installer
+
+:: Keep the venv isolated from user-level site-packages that could shadow python_env's
+set "PYTHONNOUSERSITE=1"
+
 echo %CYAN%===================================================%RESET%
 echo %CYAN%       comfyui-rocm - Automatic Installer%RESET%
 echo %CYAN%  [AMD GCN5/Vega * RDNA1 * RDNA2 * RDNA3 * RDNA4]%RESET%
