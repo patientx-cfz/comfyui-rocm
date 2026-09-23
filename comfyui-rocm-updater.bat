@@ -193,7 +193,7 @@ exit /b 0
 :: Native gfx1201 asset filename must stay "sageattention-2.2.0-cp312-cp312-win_amd64.whl".
 set "SAGE_ARCH="
 if exist "%INSTALL_DIR%\detect_gpu.py" (
-    for /f "delims=" %%A in ('"%PYTHON%" "%INSTALL_DIR%\detect_gpu.py" 2^>nul') do set "SAGE_ARCH=%%A"
+    for /f "delims=" %%A in ('call "%PYTHON%" "%INSTALL_DIR%\detect_gpu.py" 2^>nul') do set "SAGE_ARCH=%%A"
 )
 if /I "%SAGE_ARCH%"=="gfx1201" (
     set "SAGE_WHEEL_URL=https://github.com/thehybrid1337/sageattention-rocm-gfx1201-win/releases/latest/download/sageattention-2.2.0-cp312-cp312-win_amd64.whl"
