@@ -112,7 +112,7 @@ set TRITON_CACHE_AUTOTUNING=0
 :: if you have rdna3 or rdna4 and despite them being slower, you want to continue using native nodes, uninstall triton-windows. OR let it be disabled and use the custom node.
 
 :: enabling dynamic-vram because it is much better than what it was when it first released of course regarding to amd gpu compability. If you have problems with it remove it.
-set PARAMS=--disable-api-nodes --cache-lru 20 --disable-smart-memory --disable-pinned-memory --enable-manager --enable-manager-legacy-ui --disable-triton-backend --enable-dynamic-vram
+set PARAMS=--disable-partner-nodes --cache-lru 20 --disable-smart-memory --disable-pinned-memory --enable-manager --enable-manager-legacy-ui --disable-triton-backend --enable-dynamic-vram
 
 :: quad-cross is better for older generation (you can use --use-sage-attention too) 
 if "!IS_LEGACY_GPU!"=="1" set "PARAMS=%PARAMS% --use-quad-cross-attention"
