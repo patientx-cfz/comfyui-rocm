@@ -254,9 +254,9 @@ if !UNSUPPORTED!==1 (
     exit /b 1
 )
 
-:: All other GPUs use AMD's new nightly repo index
-echo %GREEN%[*]%RESET% Using new AMD nightly repo for %CYAN%!arch!%RESET%
-.\python_env\python.exe -m pip install "torch[device-!arch!]" "torchvision[device-!arch!]" torchaudio rocm-sdk-devel --pre --index-url https://nightly.repo.amd.com/rocm/whl-next/ --no-warn-script-location %Q%
+:: All other GPUs use AMD's stable repo index
+echo %GREEN%[*]%RESET% Using AMD stable repo for %CYAN%!arch!%RESET%
+.\python_env\python.exe -m pip install "torch[device-!arch!]" "torchvision[device-!arch!]" torchaudio rocm-sdk-devel --pre --index-url https://stable.repo.amd.com/rocm/whl-next/ --no-warn-script-location %Q%
 if errorlevel 1 goto :install_failed
 
 echo %GREEN%[*]%RESET% Initializing rocm-sdk...
