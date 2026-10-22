@@ -1,0 +1,1250 @@
+{
+  "id": "3c7a5a53-0e2f-5b1a-9d4e-a1b2c3d4e5f6",
+  "revision": 0,
+  "last_node_id": 63,
+  "last_link_id": 119,
+  "nodes": [
+    {
+      "id": 3,
+      "type": "CLIPLoader",
+      "pos": [
+        -1705.4499299392553,
+        56.12580279955317
+      ],
+      "size": [
+        210,
+        106
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            33
+          ]
+        }
+      ],
+      "title": "clip",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.0",
+        "Node name for S&R": "CLIPLoader",
+        "models": [
+          {
+            "name": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+            "directory": "text_encoders"
+          }
+        ],
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "clip_name": true
+          },
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "h3\\qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+        "minimax",
+        "default"
+      ],
+      "widgets_values_named": {
+        "clip_name": "h3\\qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+        "type": "minimax",
+        "device": "default"
+      },
+      "shape": 1
+    },
+    {
+      "id": 4,
+      "type": "VAELoader",
+      "pos": [
+        -1705.5534168264296,
+        100.10982028470708
+      ],
+      "size": [
+        210,
+        58
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            34,
+            74
+          ]
+        }
+      ],
+      "title": "vae",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.0",
+        "Node name for S&R": "VAELoader",
+        "models": [
+          {
+            "name": "minimax_h3_video_vae_fp16.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/vae/minimax_h3_video_vae_fp16.safetensors",
+            "directory": "vae"
+          }
+        ],
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "vae_name": true
+          },
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "minimax_h3_lynnreal_light_vae_int8_convrot.safetensors"
+      ],
+      "widgets_values_named": {
+        "vae_name": "minimax_h3_lynnreal_light_vae_int8_convrot.safetensors"
+      },
+      "shape": 1
+    },
+    {
+      "id": 20,
+      "type": "SaveImage",
+      "pos": [
+        -1212.9661069249157,
+        35.83660766357521
+      ],
+      "size": [
+        323.0797995843243,
+        646.3301573425681
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 76
+        }
+      ],
+      "outputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "links": null
+        }
+      ],
+      "title": "save image",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0",
+        "Node name for S&R": "SaveImage",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "h3still\\H3Still"
+      ],
+      "widgets_values_named": {
+        "filename_prefix": "h3still\\H3Still"
+      },
+      "shape": 1
+    },
+    {
+      "id": 10,
+      "type": "BasicGuider",
+      "pos": [
+        -1696.8405867290444,
+        613.5001748928008
+      ],
+      "size": [
+        159.568359375,
+        46
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 119
+        },
+        {
+          "name": "conditioning",
+          "type": "CONDITIONING",
+          "link": 35
+        }
+      ],
+      "outputs": [
+        {
+          "name": "GUIDER",
+          "type": "GUIDER",
+          "links": [
+            11
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.0",
+        "Node name for S&R": "BasicGuider",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "shape": 1
+    },
+    {
+      "id": 1,
+      "type": "UNETLoader",
+      "pos": [
+        -1708.0215790855907,
+        12.079920853233574
+      ],
+      "size": [
+        210,
+        82
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            87
+          ]
+        }
+      ],
+      "title": "model",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.0",
+        "Node name for S&R": "UNETLoader",
+        "models": [
+          {
+            "name": "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+            "url": "https://huggingface.co/Comfy-Org/MiniMax-H3/resolve/main/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+            "directory": "diffusion_models"
+          }
+        ],
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "unet_name": true
+          },
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "minimax_h3_hybrid_fl2va_ref2va_b25-49-int8.safetensors",
+        "default"
+      ],
+      "widgets_values_named": {
+        "unet_name": "minimax_h3_hybrid_fl2va_ref2va_b25-49-int8.safetensors",
+        "weight_dtype": "default"
+      },
+      "shape": 1
+    },
+    {
+      "id": 13,
+      "type": "SamplerCustomAdvanced",
+      "pos": [
+        -1457.2103585479663,
+        582.652812971113
+      ],
+      "size": [
+        211.125,
+        106
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 15,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 10
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 11
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 91
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 92
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 112
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": [
+            75
+          ]
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": []
+        }
+      ],
+      "title": "Sampler",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.0",
+        "Node name for S&R": "SamplerCustomAdvanced",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "shape": 1
+    },
+    {
+      "id": 9,
+      "type": "RandomNoise",
+      "pos": [
+        -1702.8880236612504,
+        141.2577227187345
+      ],
+      "size": [
+        210,
+        82
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "NOISE",
+          "type": "NOISE",
+          "links": [
+            10
+          ]
+        }
+      ],
+      "title": "seed",
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.33.0",
+        "Node name for S&R": "RandomNoise",
+        "ue_properties": {
+          "widget_ue_connectable": {
+            "noise_seed": true
+          },
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        42,
+        "fixed"
+      ],
+      "widgets_values_named": {
+        "noise_seed": 42,
+        "control_after_generate": "fixed"
+      },
+      "shape": 1
+    },
+    {
+      "id": 14,
+      "type": "FizgigH3StillDecode",
+      "pos": [
+        -1694.9961622223427,
+        666.4896877617913
+      ],
+      "size": [
+        185.6353515625,
+        46
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 75
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 74
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            76
+          ]
+        }
+      ],
+      "title": "dec",
+      "properties": {
+        "aux_id": "shootthesound/ComfyUI-Fizgig-H3-Still",
+        "ver": "10d5171f6e45b0757a03df977f53a660e060c33d",
+        "Node name for S&R": "FizgigH3StillDecode",
+        "cnr_id": "comfyui-fizgig-h3-still",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "version": "7.8",
+          "input_ue_unconnectable": {}
+        }
+      },
+      "shape": 1
+    },
+    {
+      "id": 29,
+      "type": "MiniMaxH3ReferenceToVideo",
+      "pos": [
+        -1483.611421670938,
+        141.10367394174247
+      ],
+      "size": [
+        249.1001953125,
+        392.02826433862117
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 9,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 33
+        },
+        {
+          "name": "vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": 34
+        },
+        {
+          "name": "audio_vae",
+          "shape": 7,
+          "type": "VAE",
+          "link": null
+        },
+        {
+          "name": "ref_images.ref_image_0",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 59
+        },
+        {
+          "name": "ref_images.ref_image_1",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": 60
+        },
+        {
+          "name": "ref_images.ref_image_2",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_videos.ref_video_0",
+          "shape": 7,
+          "type": "IMAGE",
+          "link": null
+        },
+        {
+          "name": "ref_video_audios.ref_video_audio_0",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "name": "ref_audios.ref_audio_0",
+          "shape": 7,
+          "type": "AUDIO",
+          "link": null
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": 81
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": 82
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            35
+          ]
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.36.0",
+        "Node name for S&R": "MiniMaxH3ReferenceToVideo",
+        "ue_properties": {
+          "widget_ue_connectable": {},
+          "input_ue_unconnectable": {}
+        }
+      },
+      "widgets_values": [
+        "Make an image depicting a scene between the man in <Picture 1> and the woman in <Picture 2>.\n\nThey are sitting in a cafe outside Eiffel tower doing nothing.",
+        1536,
+        1024,
+        5,
+        "max"
+      ],
+      "widgets_values_named": {
+        "prompt": "Make an image depicting a scene between the man in <Picture 1> and the woman in <Picture 2>.\n\nThey are sitting in a cafe outside Eiffel tower doing nothing.",
+        "width": 1536,
+        "height": 1024,
+        "length": 5,
+        "ref_image_size": "max"
+      },
+      "shape": 1
+    },
+    {
+      "id": 39,
+      "type": "LoadAndResizeImage",
+      "pos": [
+        -1700.274480466237,
+        380.0648291344979
+      ],
+      "size": [
+        210,
+        578
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 4,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            59
+          ]
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "image_path",
+          "type": "STRING",
+          "links": []
+        }
+      ],
+      "title": "img1",
+      "properties": {
+        "aux_id": "kijai/ComfyUI-kjnodes",
+        "ver": "d3cfe21625e5170126ce06fbfcfe1d88108688c3",
+        "Node name for S&R": "LoadAndResizeImage"
+      },
+      "widgets_values": [
+        "middlebury.jpg",
+        true,
+        1024,
+        1024,
+        1,
+        true,
+        2,
+        "alpha",
+        "",
+        "image"
+      ],
+      "widgets_values_named": {
+        "image": "middlebury.jpg",
+        "resize": true,
+        "width": 1024,
+        "height": 1024,
+        "repeat": 1,
+        "keep_proportion": true,
+        "divisible_by": 2,
+        "mask_channel": "alpha",
+        "background_color": "",
+        "upload": "image"
+      },
+      "shape": 1
+    },
+    {
+      "id": 40,
+      "type": "LoadAndResizeImage",
+      "pos": [
+        -1702.1846366151328,
+        427.7431017607941
+      ],
+      "size": [
+        210,
+        578
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 5,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            60
+          ]
+        },
+        {
+          "name": "mask",
+          "type": "MASK",
+          "links": []
+        },
+        {
+          "name": "width",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": []
+        },
+        {
+          "name": "image_path",
+          "type": "STRING",
+          "links": []
+        }
+      ],
+      "title": "img2",
+      "properties": {
+        "aux_id": "kijai/ComfyUI-kjnodes",
+        "ver": "d3cfe21625e5170126ce06fbfcfe1d88108688c3",
+        "Node name for S&R": "LoadAndResizeImage"
+      },
+      "widgets_values": [
+        "moss_00042_.png",
+        true,
+        1024,
+        1024,
+        1,
+        true,
+        2,
+        "alpha",
+        "",
+        "image"
+      ],
+      "widgets_values_named": {
+        "image": "moss_00042_.png",
+        "resize": true,
+        "width": 1024,
+        "height": 1024,
+        "repeat": 1,
+        "keep_proportion": true,
+        "divisible_by": 2,
+        "mask_channel": "alpha",
+        "background_color": "",
+        "upload": "image"
+      },
+      "shape": 1
+    },
+    {
+      "id": 47,
+      "type": "ResolutionSelector",
+      "pos": [
+        -1707.062506205509,
+        187.42280984500343
+      ],
+      "size": [
+        210,
+        150
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": [
+            81,
+            109
+          ]
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": [
+            82,
+            110
+          ]
+        }
+      ],
+      "properties": {
+        "cnr_id": "comfy-core",
+        "ver": "0.42.0",
+        "Node name for S&R": "ResolutionSelector"
+      },
+      "widgets_values": [
+        "9:16 (Portrait Widescreen)",
+        2.5,
+        32
+      ],
+      "widgets_values_named": {
+        "aspect_ratio": "9:16 (Portrait Widescreen)",
+        "megapixels": 2.5,
+        "multiple": 32
+      },
+      "shape": 1
+    },
+    {
+      "id": 48,
+      "type": "PTDH3CompactSampler",
+      "pos": [
+        -1700.9948275851905,
+        520.0445011104956
+      ],
+      "size": [
+        198.2203125,
+        26
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 12,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 117
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SAMPLER",
+          "type": "SAMPLER",
+          "links": [
+            91
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "Nynxz/ComfyUI-PTD-Compact",
+        "ver": "b6ae932e926b8bae0d8256dd035bb6b37e6ae9e8",
+        "Node name for S&R": "PTDH3CompactSampler"
+      },
+      "shape": 1
+    },
+    {
+      "id": 49,
+      "type": "PTDH3CompactSigmas",
+      "pos": [
+        -1700.3693788422092,
+        567.4199846529664
+      ],
+      "size": [
+        192.191015625,
+        26
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 118
+        }
+      ],
+      "outputs": [
+        {
+          "name": "SIGMAS",
+          "type": "SIGMAS",
+          "links": [
+            92
+          ]
+        }
+      ],
+      "properties": {
+        "aux_id": "Nynxz/ComfyUI-PTD-Compact",
+        "ver": "b6ae932e926b8bae0d8256dd035bb6b37e6ae9e8",
+        "Node name for S&R": "PTDH3CompactSigmas"
+      },
+      "shape": 1
+    },
+    {
+      "id": 50,
+      "type": "PTDH3CompactLoader",
+      "pos": [
+        -1599.9625709882991,
+        13.85143597379965
+      ],
+      "size": [
+        364.75529056457674,
+        82
+      ],
+      "flags": {
+        "collapsed": false
+      },
+      "order": 8,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 87
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            113
+          ]
+        }
+      ],
+      "title": "ptd",
+      "properties": {
+        "aux_id": "Nynxz/ComfyUI-PTD-Compact",
+        "ver": "b6ae932e926b8bae0d8256dd035bb6b37e6ae9e8",
+        "Node name for S&R": "PTDH3CompactLoader"
+      },
+      "widgets_values": [
+        "ptd_h3_ref2va_refasymopd_8step_int8.safetensors",
+        "fast (native kernels)"
+      ],
+      "widgets_values_named": {
+        "checkpoint": "ptd_h3_ref2va_refasymopd_8step_int8.safetensors",
+        "kernels": "fast (native kernels)"
+      },
+      "shape": 1
+    },
+    {
+      "id": 60,
+      "type": "FizgigH3StillLatent",
+      "pos": [
+        -1699.508374426857,
+        477.3413242700164
+      ],
+      "size": [
+        271.3375,
+        106
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 10,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "widget": {
+            "name": "width"
+          },
+          "link": 109
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "widget": {
+            "name": "height"
+          },
+          "link": 110
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            112
+          ]
+        }
+      ],
+      "title": "Fizgig Latent",
+      "properties": {
+        "aux_id": "shootthesound/ComfyUI-Fizgig-H3-Still",
+        "ver": "10d5171f6e45b0757a03df977f53a660e060c33d",
+        "Node name for S&R": "FizgigH3StillLatent"
+      },
+      "widgets_values": [
+        768,
+        1344,
+        1
+      ],
+      "widgets_values_named": {
+        "width": 768,
+        "height": 1344,
+        "batch_size": 1
+      },
+      "shape": 1
+    },
+    {
+      "id": 61,
+      "type": "PathchSageAttentionKJ",
+      "pos": [
+        -1592.2593279162336,
+        137.90433433103928
+      ],
+      "size": [
+        210,
+        82
+      ],
+      "flags": {
+        "collapsed": true
+      },
+      "order": 11,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 113
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            117,
+            118,
+            119
+          ]
+        }
+      ],
+      "title": "sage",
+      "properties": {
+        "aux_id": "kijai/ComfyUI-kjnodes",
+        "ver": "17195fcfa8a05f601b766a0f09c9733284f47416",
+        "Node name for S&R": "PathchSageAttentionKJ"
+      },
+      "widgets_values": [
+        "sageattn_qk_int8_pv_fp16_triton",
+        false
+      ],
+      "widgets_values_named": {
+        "sage_attention": "sageattn_qk_int8_pv_fp16_triton",
+        "allow_compile": false
+      },
+      "shape": 1
+    },
+    {
+      "id": 63,
+      "type": "Note",
+      "pos": [
+        -850.4550857818108,
+        70.63785766630272
+      ],
+      "size": [
+        601.551516807268,
+        447.04095804017527
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "title": "--- instructions ---",
+      "properties": {},
+      "widgets_values": [
+        "clone these into custom nodes (not through manager)\n\ncd ComfyUI/custom_nodes\n\ngit clone --branch release/comfyui-inference --single-branch https://github.com/vita-epfl/PTD-inference ComfyUI-PTD\n\ngit clone https://github.com/Nynxz/ComfyUI-PTD-Compact\n\ngit clone https://github.com/shootthesound/ComfyUI-Fizgig-H3-Still \n\n-----\n* sage-attention works well with this method. (rdna2 and below)\n\n* if you have RDNA3 or newer gpus use \"ck-attention\" instead.\n\n* SLA doesn't work with this because it is just 5 frames to be precise.\nSLA works best with a \"video\" with lots of frames ...\n\n* When starting comfyui shows error with ptd but it works that's not a problem.\n\nDownload these (4 and 8 step \"adapters\" , they are fixed so adapter name also determnines the step count) into comfyui-rocm\\models\\ptd (create ptd folder if not present)\n\nhttps://huggingface.co/nynxz/MiniMax-H3-PTD-LoRAs/blob/main/ptd/ptd_h3_ref2va_4step_int8.safetensors\nhttps://huggingface.co/nynxz/MiniMax-H3-PTD-LoRAs/blob/main/ptd/ptd_h3_ref2va_8step_int8.safetensors\nhttps://huggingface.co/nynxz/MiniMax-H3-PTD-LoRAs/blob/main/ptd/ptd_h3_ref2va_refasymopd_8step_int8.safetensors (alternative 8 steps)\n\nOnce all these are complete you can use this workflow.\n\n(yes this can generate stuff at 2-3 or more megapixels instead of the usual 1 mp or below)\n\n*** USE EITHER THE REF2VA BASE MODEL OR HYBRID BASE MODEL, DO NOT USE MODEL WITH TURBO MERGED ***"
+      ],
+      "widgets_values_named": {
+        "text": "clone these into custom nodes (not through manager)\n\ncd ComfyUI/custom_nodes\n\ngit clone --branch release/comfyui-inference --single-branch https://github.com/vita-epfl/PTD-inference ComfyUI-PTD\n\ngit clone https://github.com/Nynxz/ComfyUI-PTD-Compact\n\ngit clone https://github.com/shootthesound/ComfyUI-Fizgig-H3-Still \n\n-----\n* sage-attention works well with this method. (rdna2 and below)\n\n* if you have RDNA3 or newer gpus use \"ck-attention\" instead.\n\n* SLA doesn't work with this because it is just 5 frames to be precise.\nSLA works best with a \"video\" with lots of frames ...\n\n* When starting comfyui shows error with ptd but it works that's not a problem.\n\nDownload these (4 and 8 step \"adapters\" , they are fixed so adapter name also determnines the step count) into comfyui-rocm\\models\\ptd (create ptd folder if not present)\n\nhttps://huggingface.co/nynxz/MiniMax-H3-PTD-LoRAs/blob/main/ptd/ptd_h3_ref2va_4step_int8.safetensors\nhttps://huggingface.co/nynxz/MiniMax-H3-PTD-LoRAs/blob/main/ptd/ptd_h3_ref2va_8step_int8.safetensors\nhttps://huggingface.co/nynxz/MiniMax-H3-PTD-LoRAs/blob/main/ptd/ptd_h3_ref2va_refasymopd_8step_int8.safetensors (alternative 8 steps)\n\nOnce all these are complete you can use this workflow.\n\n(yes this can generate stuff at 2-3 or more megapixels instead of the usual 1 mp or below)\n\n*** USE EITHER THE REF2VA BASE MODEL OR HYBRID BASE MODEL, DO NOT USE MODEL WITH TURBO MERGED ***"
+      },
+      "color": "#432",
+      "bgcolor": "#653",
+      "shape": 1
+    }
+  ],
+  "links": [
+    [
+      10,
+      9,
+      0,
+      13,
+      0,
+      "NOISE"
+    ],
+    [
+      11,
+      10,
+      0,
+      13,
+      1,
+      "GUIDER"
+    ],
+    [
+      35,
+      29,
+      0,
+      10,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      74,
+      4,
+      0,
+      14,
+      1,
+      "VAE"
+    ],
+    [
+      75,
+      13,
+      0,
+      14,
+      0,
+      "LATENT"
+    ],
+    [
+      76,
+      14,
+      0,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      87,
+      1,
+      0,
+      50,
+      0,
+      "MODEL"
+    ],
+    [
+      91,
+      48,
+      0,
+      13,
+      2,
+      "SAMPLER"
+    ],
+    [
+      92,
+      49,
+      0,
+      13,
+      3,
+      "SIGMAS"
+    ],
+    [
+      109,
+      47,
+      0,
+      60,
+      0,
+      "INT"
+    ],
+    [
+      110,
+      47,
+      1,
+      60,
+      1,
+      "INT"
+    ],
+    [
+      112,
+      60,
+      0,
+      13,
+      4,
+      "LATENT"
+    ],
+    [
+      113,
+      50,
+      0,
+      61,
+      0,
+      "MODEL"
+    ],
+    [
+      117,
+      61,
+      0,
+      48,
+      0,
+      "MODEL"
+    ],
+    [
+      118,
+      61,
+      0,
+      49,
+      0,
+      "MODEL"
+    ],
+    [
+      119,
+      61,
+      0,
+      10,
+      0,
+      "MODEL"
+    ],
+    [
+      33,
+      3,
+      0,
+      29,
+      0,
+      "CLIP"
+    ],
+    [
+      34,
+      4,
+      0,
+      29,
+      1,
+      "VAE"
+    ],
+    [
+      59,
+      39,
+      0,
+      29,
+      3,
+      "IMAGE"
+    ],
+    [
+      60,
+      40,
+      0,
+      29,
+      4,
+      "IMAGE"
+    ],
+    [
+      81,
+      47,
+      0,
+      29,
+      9,
+      "INT"
+    ],
+    [
+      82,
+      47,
+      1,
+      29,
+      10,
+      "INT"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "minimax-h3-image-edit",
+      "bounding": [
+        -1716.43822971179,
+        -54.753380399164996,
+        845.3172617150515,
+        760.4704655565477
+      ],
+      "color": "#3f789e",
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.9663060000000788,
+      "offset": [
+        1849.4746303152335,
+        184.93652560357296
+      ]
+    },
+    "ue_links": [],
+    "links_added_by_ue": [],
+    "frontendVersion": "1.57.1",
+    "VHS_latentpreview": false,
+    "VHS_latentpreviewrate": 0,
+    "VHS_MetadataImage": true,
+    "VHS_KeepIntermediate": true
+  },
+  "version": 0.4
+}
