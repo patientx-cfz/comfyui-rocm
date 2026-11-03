@@ -194,7 +194,7 @@ def _parse_gpu_csv(output):
         for row in csv.DictReader(lines):
             name = (row.get('Name') or '').strip()
             pnp_id = (row.get('PNPDeviceID') or '').strip()
-            if name and "AMD" in name and "Radeon" in name:
+            if name and ("VEN_1002" in pnp_id.upper() or "AMD" in name or "Radeon" in name):
                 amd_gpus.append({'name': name, 'pnp_id': pnp_id})
     except csv.Error:
         pass
