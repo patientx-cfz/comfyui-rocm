@@ -126,7 +126,7 @@ if not exist "%CUSTOM_NODES_DIR%" mkdir "%CUSTOM_NODES_DIR%"
 call :UpdateCustomNode "ComfyUI-Manager" "https://github.com/Comfy-Org/ComfyUI-Manager"
 if "%IS_RDNA2%"=="1" (
     if exist "%CUSTOM_NODES_DIR%\ComfyUI-INT8-Fast-ROCM" (
-        echo [*] Removed the existing ComfyUI-INT8-Fast-ROCM node (not needed with RDNA2)...
+        echo [*] Removing the old ComfyUI-INT8-Fast-ROCM folder, it interferes with comfy-kitchen...
         rd /s /q "%CUSTOM_NODES_DIR%\ComfyUI-INT8-Fast-ROCM"
         if exist "%CUSTOM_NODES_DIR%\ComfyUI-INT8-Fast-ROCM" echo [!] Could not remove it fully - close ComfyUI and delete the folder manually.
     )
@@ -182,8 +182,8 @@ echo  Installed commit: %REMOTE_HASH%
 echo  Your models, outputs, and custom_nodes were kept.
 echo ====================================================
 echo.
-if /i "%~nx0"=="_updater_relaunch.bat" del "%~f0" >nul 2>&1
 pause
+if /i "%~nx0"=="_updater_relaunch.bat" (goto) 2>nul & del "%~f0" >nul 2>&1
 goto :EOF
 
 :UpdateCustomNode
