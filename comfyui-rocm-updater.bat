@@ -125,9 +125,8 @@ if not exist "%CUSTOM_NODES_DIR%" mkdir "%CUSTOM_NODES_DIR%"
 
 call :UpdateCustomNode "ComfyUI-Manager" "https://github.com/Comfy-Org/ComfyUI-Manager"
 if "%IS_RDNA2%"=="1" (
-    echo [*] RDNA2 detected - ComfyUI-INT8-Fast-ROCM is not needed, comfy-kitchen has native INT8 here.
     if exist "%CUSTOM_NODES_DIR%\ComfyUI-INT8-Fast-ROCM" (
-        echo [*] Removing the old ComfyUI-INT8-Fast-ROCM folder, it interferes with comfy-kitchen...
+        echo [*] Removed the existing ComfyUI-INT8-Fast-ROCM node (not needed with RDNA2)...
         rd /s /q "%CUSTOM_NODES_DIR%\ComfyUI-INT8-Fast-ROCM"
         if exist "%CUSTOM_NODES_DIR%\ComfyUI-INT8-Fast-ROCM" echo [!] Could not remove it fully - close ComfyUI and delete the folder manually.
     )
