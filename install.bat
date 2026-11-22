@@ -266,6 +266,9 @@ if errorlevel 1 echo %YELLOW%[!]%RESET% Warning: rocm-sdk init failed, continuin
 goto :install_requirements
 
 :install_requirements
+set "IS_RDNA2=0"
+if /I "!arch:~0,6!"=="gfx103" set "IS_RDNA2=1"
+
 :: Fix: AMD moved rocm_kpack.dll from _rocm_sdk_devel to _rocm_sdk_core in some builds
 if exist "python_env\Lib\site-packages\_rocm_sdk_core\bin\rocm_kpack.dll" (
     if not exist "python_env\Lib\site-packages\_rocm_sdk_devel\bin\rocm_kpack.dll" (
@@ -291,6 +294,13 @@ if not exist "requirements.txt" (
 .\python_env\python.exe -m pip install -r requirements.txt --no-warn-script-location %Q%
 if errorlevel 1 goto :install_failed
 
+:: RDNA2 gets the patientx/comfy-kitchen fork (HIP INT8) over the official build installed above
+if "!IS_RDNA2!"=="1" (
+    echo %GREEN%[*]%RESET% RDNA2 detected - installing comfy-kitchen fork with HIP INT8 support...
+    .\python_env\python.exe install_kitchen_rdna2.py
+    if errorlevel 1 echo %YELLOW%[!]%RESET% Warning: comfy-kitchen fork install failed, the official build stays. Run comfyui-rocm-updater.bat to retry.
+)
+
 echo %GREEN%[*]%RESET% Installing extensions...
 
 cd custom_nodes
@@ -298,7 +308,7 @@ if not exist comfyui-manager git clone https://github.com/Comfy-Org/ComfyUI-Mana
 if not exist CFZ-SwitchMenu git clone https://github.com/patientx/CFZ-SwitchMenu.git %QQ%
 if not exist CFZ-Caching git clone https://github.com/patientx/CFZ-Caching %QQ%
 if not exist ComfyUI-HFRemoteVae git clone https://github.com/kijai/ComfyUI-HFRemoteVae %QQ%
-if not exist ComfyUI-INT8-Fast-ROCM git clone https://github.com/patientx/ComfyUI-INT8-Fast-ROCM %QQ%
+if not "!IS_RDNA2!"=="1" if not exist ComfyUI-INT8-Fast-ROCM git clone https://github.com/patientx/ComfyUI-INT8-Fast-ROCM %QQ%
 if not exist comfyui-h3-sla-attention-rocm git clone https://github.com/patientx/comfyui-h3-sla-attention-rocm %QQ%
 cd ..
 copy comfyui-rocm.bat comfyui-user.bat /y %Q%
