@@ -109,6 +109,14 @@ echo %REMOTE_HASH%> "%HASH_FILE%"
 
 :SkipCoreUpdate
 
+:: RDNA2 (gfx103x) uses the patientx/comfy-kitchen fork instead of ComfyUI-INT8-Fast-ROCM
+set "ARCH=unknown"
+if exist "%INSTALL_DIR%\detect_gpu.py" (
+    for /f "delims=" %%A in ('call "%PYTHON%" "%INSTALL_DIR%\detect_gpu.py" 2^>nul') do set "ARCH=%%A"
+)
+set "IS_RDNA2=0"
+if /I "%ARCH:~0,6%"=="gfx103" set "IS_RDNA2=1"
+
 echo [*] Updating tracked custom nodes...
 echo.
 
@@ -116,7 +124,16 @@ set "CUSTOM_NODES_DIR=%INSTALL_DIR%\custom_nodes"
 if not exist "%CUSTOM_NODES_DIR%" mkdir "%CUSTOM_NODES_DIR%"
 
 call :UpdateCustomNode "ComfyUI-Manager" "https://github.com/Comfy-Org/ComfyUI-Manager"
-call :UpdateCustomNode "ComfyUI-INT8-Fast-ROCM" "https://github.com/patientx/ComfyUI-INT8-Fast-ROCM"
+if "%IS_RDNA2%"=="1" (
+    echo [*] RDNA2 detected - ComfyUI-INT8-Fast-ROCM is not needed, comfy-kitchen has native INT8 here.
+    if exist "%CUSTOM_NODES_DIR%\ComfyUI-INT8-Fast-ROCM" (
+        echo [*] Removing the old ComfyUI-INT8-Fast-ROCM folder, it interferes with comfy-kitchen...
+        rd /s /q "%CUSTOM_NODES_DIR%\ComfyUI-INT8-Fast-ROCM"
+        if exist "%CUSTOM_NODES_DIR%\ComfyUI-INT8-Fast-ROCM" echo [!] Could not remove it fully - close ComfyUI and delete the folder manually.
+    )
+) else (
+    call :UpdateCustomNode "ComfyUI-INT8-Fast-ROCM" "https://github.com/patientx/ComfyUI-INT8-Fast-ROCM"
+)
 call :UpdateCustomNode "comfyui-h3-sla-attention-rocm" "https://github.com/patientx/comfyui-h3-sla-attention-rocm"
 
 echo [*] Checking sageattention...
@@ -129,7 +146,10 @@ echo [*] Checking Python dependencies...
 set "PYTHONNOUSERSITE=1"
 
 :: Filter out torch/torchvision lines so pip never overwrites the pinned ROCm build
-"%PYTHON%" -c "import re; lines=open(r'%INSTALL_DIR%\requirements.txt').readlines(); pat=re.compile(r'^\s*(torch|torchvision|torchaudio)\s*([=<>!~]|$)', re.I); out=[l for l in lines if not pat.match(l)]; open(r'%INSTALL_DIR%\requirements_filtered.txt','w').writelines(out)"
+:: On RDNA2 also filter comfy-kitchen, it comes from the fork below instead of the official build
+set "FILTER_PKGS=torch|torchvision|torchaudio"
+if "%IS_RDNA2%"=="1" set "FILTER_PKGS=torch|torchvision|torchaudio|comfy[-_.]kitchen"
+"%PYTHON%" -c "import re; lines=open(r'%INSTALL_DIR%\requirements.txt').readlines(); pat=re.compile(r'^\s*(%FILTER_PKGS%)\s*([=<>!~]|$)', re.I); out=[l for l in lines if not pat.match(l)]; open(r'%INSTALL_DIR%\requirements_filtered.txt','w').writelines(out)"
 
 :: snapshot installed versions before the update
 "%PYTHON%" -m pip freeze --quiet > "%INSTALL_DIR%\_pre_freeze.txt" 2>nul
@@ -139,6 +159,11 @@ if errorlevel 1 (
     echo [!] Warning: dependency update had errors. comfyui-rocm may still work.
 ) else (
     echo [*] Dependencies are up to date.
+)
+
+if "%IS_RDNA2%"=="1" if exist "%INSTALL_DIR%\install_kitchen_rdna2.py" (
+    echo [*] Updating comfy-kitchen fork for RDNA2...
+    "%PYTHON%" "%INSTALL_DIR%\install_kitchen_rdna2.py"
 )
 
 :: snapshot again and report what actually changed
