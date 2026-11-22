@@ -45,6 +45,9 @@ if /I "!GPU_ARCH:~0,6!"=="gfx103" set "IS_LEGACY_GPU=1"
 set "IS_RDNA4_GPU=0"
 if /I "!GPU_ARCH:~0,6!"=="gfx120" set "IS_RDNA4_GPU=1"
 
+set "IS_RDNA2_GPU=0"
+if /I "!GPU_ARCH:~0,6!"=="gfx103" set "IS_RDNA2_GPU=1"
+
 if "!GPU_ARCH!"=="" (
     echo %YELLOW%[WARN]%RESET% Could not detect GPU architecture.
 ) else (
@@ -124,7 +127,10 @@ if "!IS_RDNA4_GPU!"=="1" set "PARAMS=--enable-manager --enable-manager-legacy-ui
 
 :: --------------------------- keeping the necessary packages up-to-date --------------- ::
 echo %GREEN%[INFO]%RESET% Syncing tracked packages from requirements.txt...
-for %%P in (comfyui-frontend-package comfyui-workflow-templates comfyui-embedded-docs comfy-kitchen comfy-aimdo av) do (
+set "SYNC_PKGS=comfyui-frontend-package comfyui-workflow-templates comfyui-embedded-docs comfy-kitchen comfy-aimdo av"
+:: RDNA2 runs the patientx/comfy-kitchen fork (installed by the updater), so requirements.txt must not replace it with the official build
+if "!IS_RDNA2_GPU!"=="1" set "SYNC_PKGS=comfyui-frontend-package comfyui-workflow-templates comfyui-embedded-docs comfy-aimdo av"
+for %%P in (%SYNC_PKGS%) do (
     for /f "tokens=1,2 delims==" %%A in ('findstr /i "^%%P==" "%~dp0requirements.txt"') do (
         .\python_env\python.exe -m pip show %%A 2>nul | findstr /i "^Version:" > "%TEMP%\pkgver.txt"
         set INSTALLED=
