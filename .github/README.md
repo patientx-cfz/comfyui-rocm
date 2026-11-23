@@ -79,6 +79,30 @@ install.bat
 *  Use the first one if you want to keep your comfyui-rocm up-to-date and use the second weekly or maybe bi-weekly to check for potential performance improvements or enhancements. (this is totally optional though)
 
 ## Troubleshooting
+
+## Multiple GPUs (iGPU + dGPU)
+
+On Windows, ComfyUI can pick the integrated GPU instead of the dedicated one.
+
+1. Run `listgpus.bat` and note the index of your dedicated GPU (e.g. `1 AMD Radeon RX 9060 XT`).
+2. Open `comfyui-user.bat` (not `comfyui-rocm.bat`, updates overwrite that one) and 
+ - if you are using something other than a rdna4 and already have the params line in there add this to the end of the params= line before the " sign.
+
+   ```
+    --cuda-device 1
+   ```
+
+OR if you are a rdna4 user ,add this line right before the `set "DISPLAY_PARAMS=..."` line:
+
+   ```
+   set "PARAMS=%PARAMS% --cuda-device 1"
+   ```
+
+   Replace `1` with your index.
+3. Start ComfyUI. The log should show `Set cuda device to: 1` and your dedicated GPU as `cuda:0`. That is expected: the selected GPU is the only one visible, so it becomes logical device 0.
+
+Alternative: disable the integrated GPU in Device Manager → Display adapters → Disable device (not Uninstall). GPU indices can change afterwards, so re-run `listgpus.bat`. If your monitor is plugged into the motherboard output, it will go dark.
+
 ### Incompatibilities
 - DO NOT use non-English characters as folder names anywhere in the comfyui-rocm path.
 - Make sure you do not have any residual NVIDIA graphics drivers installed on your system.
