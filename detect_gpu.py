@@ -137,6 +137,10 @@ PCI_DEV_TO_GFX = {
     '740f': ('gfx90a', 'Aldebaran (Instinct MI210)', True),
 }
 
+# APU/iGPU device IDs - deprioritized so a dGPU wins when both are present
+APU_DEV_IDS = {'1506', '1681', '163f', '150e', '1114', '1590', '1591',
+               '15d0', '1586', '15bf', '15c8', '164f'}
+
 # Comprehensive mapping of GPU model numbers to gfx codes
 # Format: (model_list, gfx_code, architecture_name, supported)
 GPU_TO_GFX = [
@@ -237,6 +241,10 @@ def detect_gpu_powershell():
         pass
     return []
 
+def is_apu(gpu):
+    m = re.search(r'DEV_([0-9A-Fa-f]{4})', gpu.get('pnp_id', ''))
+    return bool(m) and m.group(1).lower() in APU_DEV_IDS
+
 def match_gpu_to_gfx(gpu):
     # PCI device ID first - survives generic/OEM Name strings
     pnp_id = gpu.get('pnp_id', '')
@@ -280,7 +288,7 @@ def detect_gpu():
         log(f"  - {gpu['name']}  [{gpu.get('pnp_id', 'no PNPDeviceID')}]")
     
     # Try to match to known architectures
-    for gpu in amd_gpus:
+    for gpu in sorted(amd_gpus, key=is_apu):
         gfx, arch_name, supported = match_gpu_to_gfx(gpu)
         
         if gfx and supported:
